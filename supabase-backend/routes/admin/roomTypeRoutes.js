@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../supabaseClient.js');
+const { supabase } = require('../../supabaseClient.js');
 
 // GET /api/roomtype: Lấy danh sách tất cả các loại phòng dành cho Admin
 router.get('/', async (req, res) => {
