@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../index');
+const { supabase } = require('../supabaseClient.js');
 
 // GET /api/roomtype: Lấy danh sách tất cả các loại phòng dành cho Admin
-app.get('/api/roomtype', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         // Lệnh .select('*') lấy tất cả các cột từ bảng RoomType
         const { data, error } = await supabase
@@ -28,7 +28,7 @@ app.get('/api/roomtype', async (req, res) => {
 });
 
 // POST /api/roomtype: Tạo loại phòng mới cho admin
-app.post('/api/roomtype', async (req, res) => {
+router.post('/', async (req, res) => {
     // Nhận dữ liệu từ body request
     const { type_name, base_price, description } = req.body;
 
@@ -68,7 +68,7 @@ app.post('/api/roomtype', async (req, res) => {
 });
 
 // GET /api/roomtype/:id: Xem chi tiết loại phòng
-app.get('/api/roomtype/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     // Lấy ID từ URL parameter
     const typeId = req.params.id;
 
@@ -102,7 +102,7 @@ app.get('/api/roomtype/:id', async (req, res) => {
 });
 
 // PUT /api/roomtype/:id: Sửa thông tin loại phòng
-app.put('/api/roomtype/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     const typeId = req.params.id;
     // Lấy tất cả dữ liệu từ body (có thể chỉ cập nhật một phần)
     const updateData = req.body; 
@@ -136,7 +136,7 @@ app.put('/api/roomtype/:id', async (req, res) => {
 });
 
 // DELETE /api/roomtype/:id: Xoá loại phòng
-app.delete('/api/roomtype/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     const typeId = req.params.id;
 
     try {
