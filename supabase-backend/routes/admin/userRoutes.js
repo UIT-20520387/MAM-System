@@ -1,45 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { supabase } = require("../../supabaseClient.js");
+const {requireAdmin} = require('../../middlewares/authMiddleware.js');
 
 const DEFAULT_ROLE = "tenant";
-
-// Middleware: Xác thực Token và Kiểm tra vai trò Admin
-const requireAdmin = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ success: false, message: 'Yêu cầu token xác thực.' });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    try {
-        // Dùng Supabase Client để xác thực Token và lấy thông tin người dùng
-        const { data: userData, error: authError } = await supabase.auth.getUser(token);
-
-        if (authError || !userData.user) {
-            console.error("Lỗi xác thực Token:", authError?.message || 'Token không hợp lệ.');
-            return res.status(401).json({ success: false, message: 'Token không hợp lệ hoặc đã hết hạn.' });
-        }
-        
-        const user = userData.user;
-        const userRole = user.user_metadata?.role;
-        
-        // Kiểm tra Vai trò
-        if (userRole !== 'admin') {
-            return res.status(403).json({ success: false, message: `Quyền bị từ chối. Vai trò hiện tại là: ${userRole}. Chỉ Admin được phép.` });
-        }
-        
-        // Nếu Admin, truyền thông tin người dùng và cho phép tiếp tục
-        req.user = user; 
-        next();
-
-    } catch (e) {
-        console.error("Lỗi hệ thống trong Middleware Admin:", e);
-        return res.status(500).json({ success: false, message: 'Lỗi hệ thống xác thực.' });
-    }
-};
 
 // GET /api/manager/users - XEM DANH SÁCH TẤT CẢ TÀI KHOẢN (Chỉ Admin)
 router.get('/users', requireAdmin, async (req, res) => {
@@ -75,7 +39,7 @@ router.get('/users', requireAdmin, async (req, res) => {
 });
 
 // API (POST /api/user) cho Admin tạo tài khoản
-router.post("/", async (req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
   const { email, password } = req.body;
 
   // Kiểm tra dữ liệu đầu vào cơ bản
@@ -146,7 +110,7 @@ router.post("/", async (req, res) => {
 });
 
 // DELETE /api/user/:uid: Xoá một tài khoản bất kỳ
-router.delete("/:uid", async (req, res) => {
+router.delete("/:uid", requireAdmin, async (req, res) => {
   const userIdToDelete = req.params.uid;
 
   try {

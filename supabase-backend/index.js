@@ -8,6 +8,8 @@ const tenantRoutes = require('./routes/auth/tenantRoutes');
 const userRoutes = require('./routes/admin/userRoutes');
 const roomTypeRoutes = require('./routes/admin/roomTypeRoutes');
 
+const apartmentRoutes = require('./routes/manager/apartmentRoutes');
+
 
 const app = express();
 app.use(express.json()); // Middleware để đọc JSON body
@@ -21,7 +23,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/roomtype', roomTypeRoutes);
 
 // Manager routes
-
+app.use('/api/apartments', apartmentRoutes);
 
 // Tenant routes
 

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../../supabaseClient.js');
+const {requireAdmin} = require('../../middlewares/authMiddleware.js');
 
 // GET /api/roomtype: Lấy danh sách tất cả các loại phòng dành cho Admin
-router.get('/', async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
     try {
         // Lệnh .select('*') lấy tất cả các cột từ bảng RoomType
         const { data, error } = await supabase
@@ -28,7 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/roomtype: Tạo loại phòng mới cho admin
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
     // Nhận dữ liệu từ body request
     const { type_name, base_price, description } = req.body;
 
@@ -68,7 +69,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/roomtype/:id: Xem chi tiết loại phòng
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAdmin, async (req, res) => {
     // Lấy ID từ URL parameter
     const typeId = req.params.id;
 
@@ -102,7 +103,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // PUT /api/roomtype/:id: Sửa thông tin loại phòng
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAdmin, async (req, res) => {
     const typeId = req.params.id;
     // Lấy tất cả dữ liệu từ body (có thể chỉ cập nhật một phần)
     const updateData = req.body; 
@@ -136,7 +137,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/roomtype/:id: Xoá loại phòng
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
     const typeId = req.params.id;
 
     try {
@@ -167,4 +168,4 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-module.exports = router; // Export router để index.js có thể sử dụng
+module.exports = router;

@@ -1,7 +1,7 @@
 // routes/tenantRoutes.js
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../../supabaseClient');
+const { supabase } = require('../../supabaseClient.js');
 
 // Vai trò mặc định cho người dùng đăng ký qua API này
 const TENANT_ROLE = 'tenant';
