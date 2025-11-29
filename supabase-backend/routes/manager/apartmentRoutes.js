@@ -58,7 +58,7 @@ router.get('/', requireManager, async (req, res) => {
         const { data, error } = await supabase
             .from('Apartment')
             .select('*, RoomType!inner(*), manager_id') 
-            .order('apartment_num', { ascending: true }); 
+            .order('apartment_number', { ascending: true }); 
 
         if (error) {
             console.error("Lỗi DB khi lấy danh sách căn hộ:", error.message);
