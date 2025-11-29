@@ -2,7 +2,7 @@ const express = require('express');
 
 // Import routers
 const authRoutes = require('./routes/auth/authRoutes');
-const tenantRoutes = require('./routes/auth/tenantRoutes');
+const registerRoutes = require('./routes/auth/registerRoutes');
 
 
 const userRoutes = require('./routes/admin/userRoutes');
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json()); // Middleware để đọc JSON body
 
 // Auth routes
-app.use('/api/tenant', tenantRoutes);
+app.use('/api/register', registerRoutes);
 app.use('/api/auth', authRoutes);
 
 // Admin routes

@@ -7,9 +7,9 @@ const { supabase } = require('../../supabaseClient.js');
 const TENANT_ROLE = 'tenant';
 
 // ----------------------------------------------------------------------
-// POST /api/tenant/register - ĐĂNG KÝ TÀI KHOẢN CHO NGƯỜI THUÊ
+// POST /api/register - ĐĂNG KÝ TÀI KHOẢN CHO NGƯỜI THUÊ
 // ----------------------------------------------------------------------
-router.post('/register', async (req, res) => {
+router.post('/', async (req, res) => {
     const { email, password, fullName, phoneNumber, identityCardNumber } = req.body;
     
     if (!email || !password || !fullName || !phoneNumber) {
