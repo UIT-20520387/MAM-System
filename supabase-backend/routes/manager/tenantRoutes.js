@@ -21,10 +21,7 @@ router.get('/', requireManager, async (req, res) => {
             return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi tải danh sách người thuê.' });
         }
 
-        // TODO: Nếu front-end cần Email, cần thêm logic dùng Admin API listUsers 
-        // và map với TenantProfile, nhưng Admin API tốn kém và trả về mọi user.
-        // Tạm thời chỉ trả về thông tin Profile (user_id, fullname,...)
-
+        // Trả về thông tin Profile (user_id, fullname,...)
         return res.status(200).json({
             success: true,
             message: 'Tải danh sách người thuê thành công.',
