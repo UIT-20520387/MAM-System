@@ -7,11 +7,49 @@ const { requireManager } = require('../../middlewares/authMiddleware.js');
 // ROUTE QUẢN LÝ NGƯỜI THUÊ (TENANT) - CHỈ MANAGER
 // ======================================================================
 
+// Lấy hơp đồng đang hoạt động của Tenant
+const getActiveContractDetails = async (tenantId) => {
+    // Tìm hợp đồng đang hoạt động (is_active = true)
+    const { data: contract, error } = await supabase
+        .from('Contract')
+        .select(`
+            contract_id, 
+            apartment_id, 
+            start_date, 
+            end_date, 
+            deposit_amount, 
+            is_active,
+            Apartment(apartment_number, price)
+        `)
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true) 
+        .maybeSingle(); // Sử dụng maybeSingle để tránh lỗi nếu không tìm thấy
+
+    if (error) {
+        console.error(`Lỗi DB khi tìm hợp đồng đang hoạt động cho UID ${tenantId}:`, error.message);
+        return null;
+    }
+
+    if (!contract) {
+        return null; // Không có hợp đồng đang hoạt động
+    }
+    
+    // Tách thông tin căn hộ ra khỏi đối tượng hợp đồng
+    const apartmentDetails = contract.Apartment;
+    delete contract.Apartment; // Xóa đối tượng Apartment lồng nhau
+    
+    return {
+        ...contract,
+        apartment_number: apartmentDetails ? apartmentDetails.apartment_number : null,
+        price: apartmentDetails ? apartmentDetails.price : null
+    };
+};
+
 // GET /api/tenants - XEM DANH SÁCH NGƯỜI THUÊ
 router.get('/', requireManager, async (req, res) => {
     try {
         // Lấy danh sách hồ sơ người thuê (TenantProfile)
-        const { data: tenants, error } = await supabase
+        const { data: profiles, error } = await supabase
             .from('TenantProfile')
             .select('*')
             .order('fullname', { ascending: true });
@@ -21,12 +59,39 @@ router.get('/', requireManager, async (req, res) => {
             return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi tải danh sách người thuê.' });
         }
 
+        // Map qua profiles để lấy thông tin hợp đồng đang hoạt động
+        const tenantsWithContractInfo = await Promise.all(profiles.map(async (tenant) => {
+            const activeContract = await getActiveContractDetails(tenant.user_id);
+
+            if (activeContract) {
+                // Trả về thông tin Tenant + thông tin Hợp đồng quan trọng
+                return {
+                    ...tenant,
+                    apartment_number: activeContract.apartment_number,
+                    apartment_id: activeContract.apartment_id,
+                    start_date: activeContract.start_date,
+                    end_date: activeContract.end_date,
+                    is_currently_tenant: activeContract.is_active 
+                };
+            }
+            
+            // Nếu không có hợp đồng đang hoạt động
+            return {
+                ...tenant,
+                apartment_number: null,
+                apartment_id: null,
+                start_date: null,
+                end_date: null,
+                is_currently_tenant: false
+            };
+        }));
+
         // Trả về thông tin Profile (user_id, fullname,...)
         return res.status(200).json({
             success: true,
             message: 'Tải danh sách người thuê thành công.',
-            tenants: tenants,
-            totalCount: tenants.length
+            tenants: tenantsWithContractInfo,
+            totalCount: tenantsWithContractInfo.length
         });
     } catch (error) {
         console.error("Lỗi hệ thống khi lấy danh sách người thuê:", error);
@@ -39,7 +104,7 @@ router.get('/:id', requireManager, async (req, res) => {
     const tenantId = req.params.id;
 
     try {
-        // 1. Lấy thông tin hồ sơ người thuê
+        // Lấy thông tin hồ sơ người thuê
         const { data: profile, error: profileError } = await supabase
             .from('TenantProfile')
             .select('*') 
@@ -54,26 +119,52 @@ router.get('/:id', requireManager, async (req, res) => {
             return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi tải chi tiết người thuê.' });
         }
 
-        // 2. Lấy danh sách Hợp đồng của người thuê đó (JOIN với Apartment)
-        const { data: contracts, error: contractError } = await supabase
+        // Lấy danh sách Hợp đồng của người thuê đó (JOIN với Apartment)
+        const activeContractDetails = await getActiveContractDetails(tenantId);
+
+        const { data: historyContracts, error: contractError } = await supabase
             .from('Contract')
-            .select('*, Apartment(apartment_id, apartment_num, price)')
+            .select(`
+                contract_id,
+                tenant_id,
+                apartment_id,
+                start_date,
+                end_date,
+                deposit_amount,
+                is_active,
+                Apartment(apartment_number, price)
+            `)
             .eq('tenant_id', tenantId)
-            .order('start_date', { ascending: false }); // Sắp xếp hợp đồng mới nhất lên trước
+            .order('start_date', { ascending: false });
 
         if (contractError) {
             console.error("Lỗi DB khi lấy hợp đồng:", contractError.message);
             // Vẫn trả về thông tin profile nếu lỗi hợp đồng không nghiêm trọng
         }
-        
-        return res.status(200).json({
+
+        // Kết hợp dữ liệu và trả về
+        const responseData = {
             success: true,
             message: 'Tải chi tiết người thuê và lịch sử hợp đồng thành công.',
             tenant: {
                 ...profile,
-                contracts: contracts || []
+                
+                // THÔNG TIN HỢP ĐỒNG ĐANG HOẠT ĐỘNG
+                current_contract: activeContractDetails || null,
+                
+                // LỊCH SỬ HỢP ĐỒNG (Tất cả hợp đồng)
+                contract_history: historyContracts ? historyContracts.map(c => ({
+                    ...c,
+                    // Đưa thông tin apartment lên cùng cấp
+                    apartment_number: c.Apartment ? c.Apartment.apartment_number : null,
+                    price: c.Apartment ? c.Apartment.price : null,
+                    Apartment: undefined // Loại bỏ đối tượng lồng nhau ban đầu
+                })) : []
             }
-        });
+        };
+        
+        return res.status(200).json(responseData);
+        
     } catch (error) {
         console.error("Lỗi hệ thống khi lấy chi tiết người thuê:", error);
         res.status(500).json({ success: false, message: 'Lỗi hệ thống.' });
