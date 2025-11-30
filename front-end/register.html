@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Apartment Management System</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link rel="stylesheet" href="./styles/login-register.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-box" id="login-form">
+            <form action="">
+                <h2>ĐĂNG KÝ</h2>
+                <input type="text" name="fullname" id="fullnameInput" placeholder="Họ và tên" required>
+
+                <div class="input-group gender-group">
+                    <span class="label">Giới tính</span>
+
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="Name" id="genderMale" checked required>
+                        Nam
+                    </label>
+
+                    <label class="radio-label" style="margin-left: 10px;">
+                        <input type="radio" name="gender" value="Nữ" id="genderFemale">
+                        Nữ
+                    </label>
+                </div>
+
+                <input type="text" name="dob" id="dobInput" placeholder="Ngày sinh (mm/dd/yyyy)" required
+                   onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+
+                <!-- <input type="date" name="date" id="dobInput" placeholder="Ngày sinh" required> -->
+                <input type="tel" name="tel" id="phoneInput" placeholder="Số điện thoại" required>
+                <input type="tel" name="tel" id="idCardInput" placeholder="Số CCCD" required>
+
+                <button type="submit" name="register" id="registerBtn">Đăng ký</button>
+                <p>Đã có tài khoản? <a href="./index.html">Đăng nhập ngay</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

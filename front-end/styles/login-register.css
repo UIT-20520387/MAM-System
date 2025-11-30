@@ -26,7 +26,7 @@ body {
     margin-bottom: 20px;
 }
 
-.form-box input {
+.form-box input:not([type="radio"]):not([type="checkbox"]) {
     width: 100%;
     padding: 12px;
     background: #eee;
@@ -69,4 +69,42 @@ body {
 
 .form-box a:hover {
     text-decoration: underline;
+}
+
+.gender-group {
+    margin-bottom: 20px; 
+    display: flex;
+    align-items: center; 
+    padding: 12px;
+    background: #eee;
+    border-radius: 6px;
+}
+
+.gender-group .label {
+    font-size: 16px;
+    color: #555; /* Màu chữ hơi nhạt hơn input */
+    font-weight: 500;
+    margin-right: 20px; /* Khoảng cách giữa chữ "Giới tính" và các radio button */
+}
+
+.gender-group .radio-label {
+    display: inline-flex; /* Giúp căn chỉnh input và chữ trên cùng 1 hàng */
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+}
+
+.gender-group .radio-label input[type="radio"] {
+    width: auto; 
+    height: 16px; 
+    margin-right: 8px; 
+    margin-bottom: 0; 
+    padding: 0; 
+    background: transparent;
+    border: 1px solid #ccc;
+}
+
+.form-box input[type="radio"] {
+    margin-bottom: 0 !important; 
 }
