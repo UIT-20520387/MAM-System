@@ -90,4 +90,33 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// ======================================================================
+// ROUTE ĐĂNG XUẤT (LOGOUT)
+// Endpoint: POST /api/auth/logout
+// ======================================================================
+
+router.post('/logout', async (req, res) => {
+    try {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            console.error("Lỗi Supabase khi đăng xuất:", error.message);
+            // Supabase có thể trả về lỗi nếu không có phiên nào để đăng xuất, 
+            // nhưng chúng ta vẫn trả về thành công cho Front-end.
+        }
+
+        // Dù Supabase có lỗi hay không, Front-end vẫn cần xóa token cục bộ.
+        // Server trả về 200 OK và thông báo thành công.
+        res.status(200).json({ 
+            success: true, 
+            message: 'Đăng xuất thành công. Token đã được xóa khỏi phiên Supabase.' 
+        });
+
+    } catch (error) {
+        console.error("Lỗi hệ thống khi đăng xuất:", error);
+        res.status(500).json({ success: false, message: 'Lỗi hệ thống khi đăng xuất.' });
+    }
+});
+
+
 module.exports = router;
