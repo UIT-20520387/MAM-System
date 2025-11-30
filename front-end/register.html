@@ -11,9 +11,11 @@
 
 <body>
     <div class="container">
-        <div class="form-box" id="login-form">
+        <div class="form-box" id="register-form">
             <form action="">
                 <h2>ĐĂNG KÝ</h2>
+                <input type="email" name="email" id="emailInput" placeholder="Email" required>
+                <input type="password" name="password" id="passwordInput" placeholder="Mật khẩu" required>
                 <input type="text" name="fullname" id="fullnameInput" placeholder="Họ và tên" required>
 
                 <div class="input-group gender-group">
@@ -41,6 +43,7 @@
             </form>
         </div>
     </div>
+    <script type="module" src="./javascript/auth/register.js"></script>
 </body>
 
 </html>

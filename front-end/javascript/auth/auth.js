@@ -1,4 +1,5 @@
 import { apiFetch } from "../config/config.js"; // Import hàm fetch chung
+import { displayMessage } from "../utils/domUtils.js";
 
 // DOM elements
 const loginForm = document.getElementById("login-form").querySelector("form");
@@ -16,41 +17,6 @@ if (!messageContainer && loginForm) {
 // Ẩn ban đầu
 if (messageContainer) {
   messageContainer.style.display = "none";
-}
-
-/**
- * Hiển thị thông báo thành công hoặc lỗi trên form.
- * @param {string} message - Nội dung thông báo.
- * @param {boolean} isError - True nếu là lỗi, False nếu là thành công.
- */
-function displayMessage(message, isError = false) {
-  if (!messageContainer) return;
-
-  if (!message) {
-    messageContainer.style.display = "none";
-    messageContainer.textContent = "";
-    return;
-  }
-
-  messageContainer.textContent = message;
-  messageContainer.style.display = "block";
-
-  // Áp dụng CSS thuần để phân biệt màu sắc
-  messageContainer.style.padding = "10px";
-  messageContainer.style.margin = "10px 0";
-  messageContainer.style.borderRadius = "5px";
-  messageContainer.style.fontWeight = "500";
-  messageContainer.style.textAlign = "center";
-
-  if (isError) {
-    messageContainer.style.color = "#991b1b"; // Text màu đỏ đậm
-    messageContainer.style.backgroundColor = "#fee2e2"; // Nền màu đỏ nhạt
-    messageContainer.style.border = "1px solid #f87171";
-  } else {
-    messageContainer.style.color = "#065f46"; // Text màu xanh lá đậm
-    messageContainer.style.backgroundColor = "#d1fae5"; // Nền màu xanh lá nhạt
-    messageContainer.style.border = "1px solid #34d399";
-  }
 }
 
 /**
