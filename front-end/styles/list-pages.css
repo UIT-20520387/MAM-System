@@ -1,0 +1,117 @@
+/* Style cho Bảng dữ liệu */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-normal);
+}
+
+.data-table th {
+  background-color: #f4f6f8;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.data-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Style cho nút Thêm mới */
+.add-button {
+  background-color: var(--color-button-add);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+.add-button:hover {
+  background-color: var(--color-button-add-hover); /* Màu đậm hơn khi hover */
+}
+.add-button .material-symbols-outlined {
+  margin-right: 5px;
+}
+
+/* CONTAINER CHUNG CHO CÁC NÚT TRONG BẢNG */
+.action-group {
+  display: flex;
+  gap: 8px; /* Khoảng cách giữa các nút */
+}
+
+/* Style cho các nút Hành động trong bảng */
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-header);
+  margin-right: 10px;
+  transition: color 0.2s;
+}
+
+.action-btn {
+  width: 32px; /* Kích thước cố định */
+  height: 32px; /* Kích thước cố định */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s, background-color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+.action-btn .material-symbols-outlined {
+  font-size: 20px;
+  margin: 0;
+}
+
+/* Màu cụ thể cho từng loại nút */
+
+/* Nút View (Xem Chi tiết) - Xanh dương */
+.view-detail-btn {
+  background-color: var(--color-button-view-detail);
+}
+.view-detail-btn:hover {
+  background-color: var(--color-button-view-detail-hover);
+}
+
+/* Nút Edit (Chỉnh sửa) - Vàng */
+.edit-btn {
+  background-color: var(--color-button-edit);
+}
+.edit-btn:hover {
+  background-color: var(--color-button-edit-hover);
+}
+
+/* Nút Delete (Xóa) - Đỏ */
+.delete-btn {
+  background-color: var(--color-button-delete);
+}
+.delete-btn:hover {
+  background-color: var(--color-button-delete-hover);
+}
+
+/* Message/Loader */
+#message-area {
+  text-align: center;
+  color: #666;
+  margin-top: 20px;
+}

@@ -1,10 +1,21 @@
 :root {
+  /* Màu các thành phần chính */
   --color-menu: #343d46;
   --color-header: #4f5b66;
   --color-main-content: #c0c5ce;
   --color-text-inactive: #c0c5ce;
   --color-text-active: #fff;
   --color-text-header: #fff;
+
+  /* Màu action button */
+  --color-button-add: #28a745;
+  --color-button-add-hover: #218838;
+  --color-button-edit: #ffc107;
+  --color-button-edit-hover: #d39e00;
+  --color-button-delete: #dc3545;
+  --color-button-delete-hover: #bd2130;
+  --color-button-view-detail: #007bff;
+  --color-button-view-detail-hover: #0056b3;
 }
 * {
   margin: 0;
@@ -50,17 +61,17 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 12px 16px; 
+  padding: 12px 16px;
   box-sizing: border-box;
 
   /* Reset các style mặc định của <a> và <button> */
-  text-decoration: none; 
-  background: none; 
-  border: none; 
-  text-align: left; 
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
   cursor: pointer;
 
-  color: var(--color-text-inactive); 
+  color: var(--color-text-inactive);
   font-family: inherit;
   font-size: 16px;
   font-weight: 500;
@@ -78,6 +89,16 @@ body {
   margin-right: 12px;
 }
 
+/* Style khi ACTIVE */
+.nav-link.active {
+  color: var(--color-text-active);
+  background-color: var(--color-header);
+}
+.nav-link.active a,
+.nav-link.active button {
+  color: var(--color-text-active);
+}
+
 /* Divider */
 .menu-divider {
   display: flex;
@@ -85,7 +106,7 @@ body {
   padding: 4px 0;
 }
 .menu-divider-line {
-  width: 95%; 
+  width: 95%;
   height: 1px;
   background-color: var(--color-text-inactive);
   opacity: 0.5;
@@ -122,7 +143,7 @@ body {
   color: var(--color-header);
 }
 
-.header-title .header-text {
+.header-title .header-page-title {
   margin-left: 12px;
 }
 

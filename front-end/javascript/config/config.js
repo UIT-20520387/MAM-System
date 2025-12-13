@@ -34,9 +34,22 @@ const apiFetch = async (endpoint, options = {}) => {
 
         // Xử lý lỗi HTTP chung
         if (!response.ok) {
-            // Đọc lỗi từ server response
-            const errorData = await response.json().catch(() => ({ message: 'Lỗi không xác định từ server.' }));
+            // Đọc nội dung lỗi (có thể là JSON hoặc HTML)
+            let errorData = {};
+            const responseText = await response.text();
             
+            try {
+                // Cố gắng parse JSON
+                errorData = JSON.parse(responseText);
+            } catch (e) {
+                // Nếu không phải JSON (là HTML), tạo thông báo lỗi chung
+                if (responseText.startsWith('<!DOCTYPE')) {
+                    errorData.message = `Lỗi HTTP ${response.status}: Lỗi máy chủ hoặc API không tìm thấy. Server trả về HTML.`;
+                } else {
+                    errorData.message = responseText || `Lỗi không xác định từ server (HTTP ${response.status}).`;
+                }
+            }
+
             // Xử lý Unauthenticated (token hết hạn/sai)
             if (response.status === 401 || response.status === 403) {
                  // Nếu đây là lỗi 401/403, kiểm tra nếu có token, ta xóa nó
