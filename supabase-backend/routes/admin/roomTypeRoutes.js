@@ -10,7 +10,7 @@ router.get('/', requireAdmin, async (req, res) => {
         const { data, error } = await supabase
             .from('RoomType')
             .select('*')
-            .order('type_name', { ascending: true });
+            .order('type_id', { ascending: true });
 
         if (error) {
             console.error("Lỗi DB khi lấy danh sách loại phòng:", error.message);

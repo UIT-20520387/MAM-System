@@ -51,14 +51,14 @@
 }
 
 /* Style cho các nút Hành động trong bảng */
-.action-btn {
+/* .action-btn {
   background: none;
   border: none;
   cursor: pointer;
   color: var(--color-header);
   margin-right: 10px;
   transition: color 0.2s;
-}
+} */
 
 .action-btn {
   width: 32px; /* Kích thước cố định */
@@ -66,12 +66,13 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: opacity 0.2s, background-color 0.2s, transform 0.1s;
+  transition: opacity 0.2s, background-color 0.2s, transform 0.1s, color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-right: 10px;
 }
 
 .action-btn:hover {

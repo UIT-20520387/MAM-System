@@ -6,6 +6,8 @@
   --color-text-inactive: #c0c5ce;
   --color-text-active: #fff;
   --color-text-header: #fff;
+  --color-text-normal: #333;
+  --color-border: #ddd;
 
   /* Màu action button */
   --color-button-add: #28a745;
@@ -16,6 +18,8 @@
   --color-button-delete-hover: #bd2130;
   --color-button-view-detail: #007bff;
   --color-button-view-detail-hover: #0056b3;
+  --color-button-back: #6c757d;
+  --color-button-back-hover: #5a6268;
 }
 * {
   margin: 0;
@@ -174,13 +178,17 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.content-area h2 {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
+.content-header {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 20px;
+}
+
+.content-title {
+  font-size: 20px; 
+  font-weight: bold; 
+  color: var(--color-text-normal); 
   margin-bottom: 16px;
 }
 
-.content-area .content-text {
-  color: #666;
-}

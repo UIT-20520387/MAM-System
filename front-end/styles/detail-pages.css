@@ -1,0 +1,54 @@
+:root {
+  /* Màu detail card */
+  --color-background-card: #f8f9fa;
+  --color-border-solid: #e9ecef;
+  --color-border-dashed: #ced4da;
+}
+
+/* Nút Quay lại - Màu xám */
+.back-button {
+  background-color: var(--color-button-back);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+.back-button:hover {
+  background-color: var(--color-button-back-hover);
+}
+
+.back-button .material-symbols-outlined {
+  margin-right: 5px;
+}
+
+/* ------------------------------------------- */
+/* STYLE CHO CHI TIẾT LOẠI PHÒNG */
+/* ------------------------------------------- */
+.detail-card {
+  background-color: var(--color-background-card);
+  border: 1px solid var(--color-border-solid);
+  border-radius: 8px;
+  padding: 30px;
+  margin-top: 20px;
+}
+.detail-row {
+  display: flex;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed var(--color-border-dashed);
+  padding-bottom: 10px;
+}
+.detail-label {
+  font-weight: 600;
+  color: var(--color-header);
+  width: 250px;
+}
+.detail-value {
+  flex-grow: 1;
+  color: var(--color-text-normal);
+}
