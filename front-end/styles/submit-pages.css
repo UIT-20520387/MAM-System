@@ -1,0 +1,83 @@
+/* Nút Submit (Dùng màu Primary) */
+.submit-action {
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+}
+.submit-button {
+  background-color: var(--color-primary);
+}
+.submit-button:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.cancel-button {
+  background-color: var(--color-secondary);
+}
+
+.cancel-button:hover {
+  background-color: var(--color-secondary-hover);
+  transform: translateY(-1px);
+}
+
+/* Style cho Input/Textarea */
+.form-input-container input:not([type="submit"]),
+.form-input-container textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input-container input:focus,
+.form-input-container textarea:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+.form-input-container textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Style cho button submit */
+.form-action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.form-action .material-symbols-outlined {
+  margin-right: 5px;
+}
+
+/* Message trong form */
+#form-message {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 500;
+  display: none;
+}
+.message-error {
+  background-color: #f8d7da;
+  color: var(--color-danger);
+  border: 1px solid #f5c6cb;
+}
+.message-success {
+  background-color: #d4edda;
+  color: var(--color-primary);
+  border: 1px solid #c3e6cb;
+}

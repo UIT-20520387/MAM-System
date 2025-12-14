@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../styles/global.css">
     <link rel="stylesheet" href="../../styles/list-pages.css">
     <link rel="stylesheet" href="../../styles/detail-pages.css">
+    <link rel="stylesheet" href="../../styles/submit-pages.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
@@ -90,9 +91,9 @@
                 <div id="list-view">
                     <div class="content-header">
                         <h2 id="list-title" class="content-title">Danh sách Loại phòng</h2>
-                        <button class="add-button">
+                        <button id="addNewBtn" class="add-button">
                             <span class="material-symbols-outlined">add</span>
-                            Thêm Loại Phòng mới
+                            Thêm Loại phòng mới
                         </button>
                     </div>
 
@@ -119,6 +120,63 @@
                     </div>
                 </div>
 
+                <!-- ---------------------------------------------------- -->
+                <!-- CONTAINER THÊM MỚI (Mặc định ẩn) -->
+                <!-- ---------------------------------------------------- -->
+                <div id="add-view" style="display: none;">
+                    <h2 class="content-title">Thêm Loại Phòng Mới</h2>
+                    
+                    <form id="addRoomTypeForm" class="content-card">
+                        
+                        <div id="form-message" style="display: none;"></div>
+                        
+                        <!-- Input: ID -->
+                        <div class="form-group">
+                            <label for="type_id" class="form-label">ID Loại Phòng:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="type_id" name="type_id" required maxlength="10">
+                            </div>
+                        </div>
+                        
+                        <!-- Input: Tên Loại Phòng -->
+                        <div class="form-group">
+                            <label for="type_name" class="form-label">Tên Loại Phòng:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="type_name" name="type_name" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Input: Giá Gốc -->
+                        <div class="form-group">
+                            <label for="base_price" class="form-label">Giá gốc (VNĐ/tháng):</label>
+                            <div class="form-input-container">
+                                <input type="number" id="base_price" name="base_price" required min="1000">
+                            </div>
+                        </div>
+                        
+                        <!-- Textarea: Mô tả -->
+                        <div class="form-group" style="border-bottom: none;">
+                            <label for="description" class="form-label">Mô tả:</label>
+                            <div class="form-input-container">
+                                <textarea id="description" name="description" rows="4"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Nút Hành động -->
+                        <div class="form-action">
+                            <button type="button" class="submit-action cancel-button" id="cancelAddBtn">
+                                <span class="material-symbols-outlined">cancel</span>
+                                Hủy
+                            </button>
+                            <button type="submit" class="submit-action submit-button">
+                                <span class="material-symbols-outlined">save</span>
+                                Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
 
             </div>
 

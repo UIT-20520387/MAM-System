@@ -1,11 +1,50 @@
 import { apiFetch } from '../config/config.js';
 
+// --- KHAI BÁO CÁC PHẦN TỬ DOM ---
 const listView = document.getElementById('list-view');
 const detailView = document.getElementById('detail-view');
+const addView = document.getElementById('add-view');
 const roomTypesListContainer = document.getElementById('room-types-list');
 const detailContainer = document.getElementById('detail-container');
+const messageArea = document.getElementById('message-area'); 
+
+// Các nút và form
+const addNewBtn = document.getElementById('addNewBtn');
 const backToListBtn = document.getElementById('backToListBtn');
-const messageArea = document.getElementById('message-area');
+const addRoomTypeForm = document.getElementById('addRoomTypeForm'); 
+const cancelAddBtn = document.getElementById('cancelAddBtn'); 
+const formMessage = document.getElementById('form-message'); 
+
+// ====================================================================
+// CÁC HÀM QUẢN LÝ VIEW (CHUYỂN ĐỔI GIAO DIỆN)
+// ====================================================================
+
+// Hiển thị thông báo trạng thái trong form (Thêm mới/Edit)
+function displayFormMessage(message, type = 'error') {
+    formMessage.textContent = message;
+    formMessage.className = `message-${type}`;
+    formMessage.style.display = 'block';
+}
+
+// Chuyển về chế độ xem danh sách
+function showListView() {
+    detailView.style.display = 'none';
+    addView.style.display = 'none'; 
+    listView.style.display = 'block';
+    loadRoomTypes(); 
+}
+
+// Chuyển sang chế độ xem form Thêm mới
+function showAddView() {
+    listView.style.display = 'none';
+    detailView.style.display = 'none';
+    addView.style.display = 'block';
+    
+    // Reset form và thông báo khi mở
+    addRoomTypeForm.reset(); 
+    formMessage.style.display = 'none';
+}
+
 
 // ====================================================================
 // CÁC HÀM RENDER UI
@@ -100,14 +139,11 @@ function renderRoomDetail(roomType) {
     
     // Ẩn danh sách, hiển thị chi tiết
     listView.style.display = 'none';
+    addView.style.display = 'none';
     detailView.style.display = 'block';
 }
 
-// Chuyển về chế độ xem danh sách
-function showListView() {
-    detailView.style.display = 'none';
-    listView.style.display = 'block';
-}
+
 
 // ====================================================================
 // CÁC HÀM XỬ LÝ DỮ LIỆU/API
@@ -124,6 +160,8 @@ async function loadRoomTypes() {
             method: 'GET'
         });
 
+        console.log('API Response (Room Types - Cần kiểm tra cấu trúc này):', result);
+
         const roomTypes = Array.isArray(result) ? result : result.roomTypes;
         
         renderRoomTypes(roomTypes || []); 
@@ -132,6 +170,8 @@ async function loadRoomTypes() {
         // apiFetch đã tự động throw Error với message từ server (hoặc message lỗi custom)
         console.error('Lỗi khi tải Loại Phòng:', error);
         messageArea.textContent = `Tải dữ liệu thất bại: ${error.message}`;
+        document.getElementById('message-area').textContent = `Tải dữ liệu thất bại: ${error.message}`;
+        roomTypesListContainer.innerHTML = '';
     }
 }
 
@@ -153,6 +193,104 @@ async function loadRoomDetail(id) {
         detailContainer.innerHTML = `<div class="detail-card" style="color: var(--color-button-delete)">Lỗi tải chi tiết: ${error.message}</div>`;
         listView.style.display = 'none';
         detailView.style.display = 'block';
+    }
+}
+
+/**
+ * Xử lý submit form Thêm mới Loại Phòng
+ * @param {Event} event - Sự kiện submit form
+ */
+async function handleAddSubmit(event) {
+    event.preventDefault();
+    
+    formMessage.style.display = 'none';
+    
+    const form = event.target;
+    const submitButton = form.querySelector('.submit-button');
+    
+    // Tắt nút submit trong khi chờ
+    submitButton.disabled = true;
+    submitButton.textContent = 'Đang xử lý...';
+
+    const priceValue = form.base_price.value.trim();
+    const parsedPrice = parseInt(priceValue, 10);
+    
+    // Thu thập dữ liệu form theo yêu cầu database
+    const roomType = {
+        type_id: form.type_id.value.trim(),
+        type_name: form.type_name.value.trim(),
+        // Chuyển Giá Gốc sang kiểu số nguyên
+        base_price: isNaN(parsedPrice) ? 0 : parsedPrice, 
+        description: form.description.value.trim(),
+    };
+
+    console.log('Dữ liệu gửi lên API POST:', roomType);
+    
+    // Thêm kiểm tra validation đơn giản (base_price > 0)
+    if (roomType.base_price <= 0 || isNaN(roomType.base_price)) {
+        displayFormMessage('Giá gốc phải là một số nguyên dương.', 'error');
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Thêm Mới';
+        return;
+    }
+    if (!roomType.type_id) {
+         displayFormMessage('ID Loại Phòng không được để trống.', 'error');
+         submitButton.disabled = false;
+         submitButton.innerHTML = '<span class="material-icons" style="margin-right: 5px;">save</span> Thêm Mới';
+         return;
+    }
+
+    try {
+        // ENDPOINT THÊM MỚI: POST /roomtype
+        const result = await apiFetch('/roomtype', {
+            method: 'POST',
+            body: roomType,
+        });
+
+        console.log('API Response (Add Room Type):', result);
+
+        // Giả định nếu API trả về thành công 200/201
+        // Kiểm tra success: true từ response JSON của backend
+        if (result && result.success) {
+            displayFormMessage(result.message || 'Thêm loại phòng mới thành công!', 'success');
+        } else {
+             // Trường hợp backend trả về 200/201 nhưng có success: false (Ít xảy ra)
+             throw new Error(result.message || 'Thêm loại phòng thất bại do lỗi không xác định.');
+        }
+        
+        // Quay lại danh sách sau 1.5 giây
+        setTimeout(() => {
+            showListView();
+        }, 1500);
+
+    } catch (error) {
+        // Xử lý lỗi từ API (ví dụ: ID đã tồn tại)
+        console.error('Lỗi khi thêm Loại Phòng:', error);
+
+        let errorMessage = `Thêm mới thất bại: ${error.message}`;
+        let status = error.status || '???';
+        
+        // Xử lý lỗi từ API (400, 401, 403, 409, 500)
+        if (error.status === 409) { 
+            errorMessage = error.message || 'Mã loại phòng này đã tồn tại.';
+        } else if (error.status === 400 && error.message) { 
+             errorMessage = error.message;
+        } else if (error.status === 403) { 
+             errorMessage = error.message || 'Bạn không có quyền thực hiện hành động này (Yêu cầu Admin).';
+        } else if (error.status) {
+             // Lỗi Response HTML (400 Bad Request do JSON Double-stringified)
+             if (error.message.includes('Server trả về HTML')) {
+                errorMessage = error.message; 
+             } else {
+                errorMessage = `Thêm mới thất bại: Lỗi HTTP ${status}. Vui lòng kiểm tra Console.`;
+             }
+        }
+        
+        displayFormMessage(`Thêm mới thất bại: ${error.message}`, 'error');
+        
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu';
     }
 }
 
@@ -178,19 +316,23 @@ function setupTableEventListeners() {
 
 // Thiết lập các listener chung cho cả trang (Nút Quay lại, nút Thêm mới).
 function setupGlobalEventListeners() {
-    // Listener cho nút Quay lại
+    // Nút Thêm Loại phòng mới (chuyển sang Add View)
+    addNewBtn.addEventListener('click', showAddView);
+    
+    // Nút Quay lại Danh sách (từ Detail View)
     backToListBtn.addEventListener('click', showListView);
     
-    // Listener cho nút Thêm mới (Hiện tại chưa làm gì)
-    document.querySelector('.add-button').addEventListener('click', () => {
-        alert('Chức năng Thêm Loại Phòng sẽ được phát triển sau.'); 
-    });
+    // Nút Hủy (từ Add View)
+    cancelAddBtn.addEventListener('click', showListView);
+
+    // Submit Form Thêm mới
+    addRoomTypeForm.addEventListener('submit', handleAddSubmit);
 }
+
 
 // ====================================================================
 // KHỞI TẠO
 // ====================================================================
-
 
 // Chạy logic khi DOM đã sẵn sàng
 document.addEventListener('DOMContentLoaded', () => {

@@ -7,7 +7,7 @@
 
 /* Nút Quay lại - Màu xám */
 .back-button {
-  background-color: var(--color-button-back);
+  background-color: var(--color-secondary);
   color: white;
   padding: 10px 15px;
   border: none;
@@ -20,7 +20,7 @@
   align-items: center;
 }
 .back-button:hover {
-  background-color: var(--color-button-back-hover);
+  background-color: var(--color-secondary-hover);
 }
 
 .back-button .material-symbols-outlined {

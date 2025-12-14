@@ -9,17 +9,21 @@
   --color-text-normal: #333;
   --color-border: #ddd;
 
-  /* Màu action button */
-  --color-button-add: #28a745;
-  --color-button-add-hover: #218838;
-  --color-button-edit: #ffc107;
-  --color-button-edit-hover: #d39e00;
-  --color-button-delete: #dc3545;
-  --color-button-delete-hover: #bd2130;
-  --color-button-view-detail: #007bff;
-  --color-button-view-detail-hover: #0056b3;
-  --color-button-back: #6c757d;
-  --color-button-back-hover: #5a6268;
+  /* Màu action */
+  --color-primary: #28a745;
+  --color-primary-hover: #218838;
+
+  --color-warning: #ffc107;
+  --color-warning-hover: #d39e00;
+
+  --color-danger: #dc3545;
+  --color-danger-hover: #bd2130;
+
+  --color-success: #007bff;
+  --color-success-hover: #0056b3;
+
+  --color-secondary: #6c757d;
+  --color-secondary-hover: #5a6268;
 }
 * {
   margin: 0;
@@ -192,3 +196,9 @@ body {
   margin-bottom: 16px;
 }
 
+/* Message/Loader */
+#message-area {
+  text-align: center;
+  color: #666;
+  margin-top: 20px;
+}
