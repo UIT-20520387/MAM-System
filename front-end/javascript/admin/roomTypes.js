@@ -15,9 +15,24 @@ const addRoomTypeForm = document.getElementById('addRoomTypeForm');
 const cancelAddBtn = document.getElementById('cancelAddBtn'); 
 const formMessage = document.getElementById('form-message'); 
 
+// Modal Elements (Mới)
+const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+const modalCancelBtn = document.getElementById('modalCancelBtn');
+const modalBodyText = document.getElementById('modalBodyText');
+
 // ====================================================================
 // CÁC HÀM QUẢN LÝ VIEW (CHUYỂN ĐỔI GIAO DIỆN)
 // ====================================================================
+
+function displayMessage(message, type = 'error') {
+    messageArea.textContent = message;
+    messageArea.className = `message-${type}`;
+    messageArea.style.display = 'block';
+    setTimeout(() => {
+        messageArea.style.display = 'none';
+    }, 5000); 
+}
 
 // Hiển thị thông báo trạng thái trong form (Thêm mới/Edit)
 function displayFormMessage(message, type = 'error') {
@@ -197,6 +212,53 @@ async function loadRoomDetail(id) {
 }
 
 /**
+ * Hàm xử lý Xóa Loại Phòng sau khi xác nhận. 
+ * @param {string} id - ID của loại phòng cần xóa.
+ */
+async function handleDeleteRoomType(id) {
+    if (!id) return;
+    
+    // Ẩn modal và hiển thị thông báo xử lý
+    if (deleteConfirmModal) {
+        deleteConfirmModal.style.display = 'none';
+    }
+
+    displayMessage(`Đang xóa loại phòng ID: ${id}...`, 'info');
+
+    try {
+        const result = await apiFetch(`/roomtype/${id}`, {
+            method: 'DELETE',
+        });
+
+        // Kiểm tra success
+        if (result && result.success) {
+            displayMessage(result.message || `Xóa loại phòng ID: ${id} thành công!`, 'success');
+            loadRoomTypes(); // Tải lại danh sách sau khi xóa thành công
+        } else {
+             // Trường hợp API trả về 200 nhưng có success: false 
+             throw new Error(result?.message || 'Xóa loại phòng thất bại do lỗi không xác định.');
+        }
+
+    } catch (error) {
+        console.error('Lỗi khi xóa Loại Phòng (DELETE - FAILED):', error);
+        
+        let errorMessage = `Xóa thất bại: ${error.message}`;
+        if (error.status === 404) {
+             errorMessage = 'Không tìm thấy loại phòng cần xóa.';
+        } else if (error.status === 409) {
+             // Bắt lỗi ràng buộc khóa ngoại từ logic backend của bạn
+             errorMessage = error.message || 'Không thể xóa loại phòng vì nó đang được sử dụng.';
+        } else if (error.status === 403) {
+             errorMessage = error.message || 'Bạn không có quyền xóa loại phòng này (Yêu cầu Admin).';
+        } else if (error.status) {
+             errorMessage = `Xóa thất bại: Lỗi HTTP ${error.status}. Vui lòng kiểm tra Console.`;
+        }
+        
+        displayMessage(errorMessage, 'error');
+    }
+}
+
+/**
  * Xử lý submit form Thêm mới Loại Phòng
  * @param {Event} event - Sự kiện submit form
  */
@@ -311,7 +373,28 @@ function setupTableEventListeners() {
     
     // Bạn có thể thêm listener cho nút Edit và Delete ở đây sau
     // document.querySelectorAll('.edit-btn').forEach(button => { /* ... */ });
-    // document.querySelectorAll('.delete-btn').forEach(button => { /* ... */ });
+
+    // Listener cho nút Delete
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const id = event.currentTarget.dataset.id;
+            
+            // Chỉ chạy logic Modal nếu các phần tử Modal tồn tại
+            if (deleteConfirmModal && modalConfirmBtn && modalBodyText) {
+                // Cập nhật nội dung Modal
+                modalBodyText.textContent = `Bạn có chắc chắn muốn xóa loại phòng với ID: ${id}? Hành động này không thể hoàn tác.`;
+                
+                // Gán ID vào nút xác nhận
+                modalConfirmBtn.dataset.idToDelete = id;
+
+                // Hiển thị Modal
+                deleteConfirmModal.style.display = 'flex'; 
+            } else {
+                 console.error("Lỗi: Các phần tử Modal không tìm thấy.");
+                 displayMessage('Lỗi: Không tìm thấy hộp thoại xác nhận. Vui lòng kiểm tra console.', 'error');
+            }
+        });
+    });
 }
 
 // Thiết lập các listener chung cho cả trang (Nút Quay lại, nút Thêm mới).
@@ -327,6 +410,31 @@ function setupGlobalEventListeners() {
 
     // Submit Form Thêm mới
     addRoomTypeForm.addEventListener('submit', handleAddSubmit);
+
+    // Logic Modal (Sử dụng các element đã tồn tại trong DOM)
+    if (modalCancelBtn && modalConfirmBtn && deleteConfirmModal) {
+        // Hủy bỏ việc xóa
+        modalCancelBtn.addEventListener('click', () => {
+            deleteConfirmModal.style.display = 'none';
+            modalConfirmBtn.dataset.idToDelete = ''; // Xóa ID đã gán
+        });
+
+        // Xác nhận xóa
+        modalConfirmBtn.addEventListener('click', () => {
+            const id = modalConfirmBtn.dataset.idToDelete;
+            if (id) {
+                handleDeleteRoomType(id);
+            }
+        });
+        
+        // Đóng Modal khi click ra ngoài
+        deleteConfirmModal.addEventListener('click', (event) => {
+            if (event.target === deleteConfirmModal) {
+                deleteConfirmModal.style.display = 'none';
+                modalConfirmBtn.dataset.idToDelete = '';
+            }
+        });
+    }
 }
 
 

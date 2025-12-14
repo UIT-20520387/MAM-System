@@ -114,7 +114,7 @@
                             Quay lại Danh sách
                         </button>
                     </div>
-                    
+
                     <div id="detail-container">
                         <!-- Nội dung chi tiết sẽ được render vào đây -->
                     </div>
@@ -125,11 +125,11 @@
                 <!-- ---------------------------------------------------- -->
                 <div id="add-view" style="display: none;">
                     <h2 class="content-title">Thêm Loại Phòng Mới</h2>
-                    
+
                     <form id="addRoomTypeForm" class="content-card">
-                        
+
                         <div id="form-message" style="display: none;"></div>
-                        
+
                         <!-- Input: ID -->
                         <div class="form-group">
                             <label for="type_id" class="form-label">ID Loại Phòng:</label>
@@ -137,7 +137,7 @@
                                 <input type="text" id="type_id" name="type_id" required maxlength="10">
                             </div>
                         </div>
-                        
+
                         <!-- Input: Tên Loại Phòng -->
                         <div class="form-group">
                             <label for="type_name" class="form-label">Tên Loại Phòng:</label>
@@ -145,7 +145,7 @@
                                 <input type="text" id="type_name" name="type_name" required>
                             </div>
                         </div>
-                        
+
                         <!-- Input: Giá Gốc -->
                         <div class="form-group">
                             <label for="base_price" class="form-label">Giá gốc (VNĐ/tháng):</label>
@@ -153,7 +153,7 @@
                                 <input type="number" id="base_price" name="base_price" required min="1000">
                             </div>
                         </div>
-                        
+
                         <!-- Textarea: Mô tả -->
                         <div class="form-group" style="border-bottom: none;">
                             <label for="description" class="form-label">Mô tả:</label>
@@ -161,7 +161,7 @@
                                 <textarea id="description" name="description" rows="4"></textarea>
                             </div>
                         </div>
-                        
+
                         <!-- Nút Hành động -->
                         <div class="form-action">
                             <button type="button" class="submit-action cancel-button" id="cancelAddBtn">
@@ -175,12 +175,27 @@
                         </div>
                     </form>
                 </div>
-                
-            </div>
+
+                <!-- Hộp thoại xác nhận xoá -->
+                <div id="deleteConfirmModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">Xác nhận Xóa</div>
+                        <div class="modal-body">
+                            <p id="modalBodyText">Bạn có chắc chắn muốn xóa loại phòng này?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="modalCancelBtn" class="modal-btn modal-btn-cancel">Hủy</button>
+                            <button id="modalConfirmBtn" class="modal-btn modal-btn-confirm"
+                                data-id-to-delete="">Xóa</button>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
-        </section>
+    </div>
+
+    </section>
     </div>
 
     <script src="../../javascript/config/config.js"></script>
