@@ -15,16 +15,28 @@ const addRoomTypeForm = document.getElementById('addRoomTypeForm');
 const cancelAddBtn = document.getElementById('cancelAddBtn'); 
 const formMessage = document.getElementById('form-message'); 
 
+// Các phần tử trong Form View
+const formTitle = document.getElementById('form-title'); // Giả định tiêu đề form có ID này
+const formSubmitButton = document.getElementById('form-submit-button'); // Giả định nút submit có ID này
+const typeIdInput = document.getElementById('type_id'); // Input ID
+const typeNameInput = document.getElementById('type_name'); // Input Tên
+const basePriceInput = document.getElementById('base_price'); // Input Giá
+const descriptionInput = document.getElementById('description'); // Input Mô tả
+
 // Modal Elements (Mới)
 const deleteConfirmModal = document.getElementById('deleteConfirmModal');
 const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 const modalCancelBtn = document.getElementById('modalCancelBtn');
 const modalBodyText = document.getElementById('modalBodyText');
 
+// BIẾN TRẠNG THÁI - Theo dõi chế độ Thêm mới (null) hay Sửa (ID)
+let currentEditingRoomTypeId = null;
+
 // ====================================================================
 // CÁC HÀM QUẢN LÝ VIEW (CHUYỂN ĐỔI GIAO DIỆN)
 // ====================================================================
 
+// Hiển thị thông báo chung
 function displayMessage(message, type = 'error') {
     messageArea.textContent = message;
     messageArea.className = `message-${type}`;
@@ -54,12 +66,59 @@ function showAddView() {
     listView.style.display = 'none';
     detailView.style.display = 'none';
     addView.style.display = 'block';
+
+    // Cập nhật trạng thái
+    currentEditingRoomTypeId = null;
+
+    // Cập nhật UI
+    formTitle.textContent = 'Thêm Loại phòng mới';
+    if (formSubmitButton) {
+        formSubmitButton.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu';
+        formSubmitButton.classList.remove('warning-button');
+    }
+    if (typeIdInput) {
+        typeIdInput.disabled = false; // Bật ID để thêm mới
+    }
     
     // Reset form và thông báo khi mở
     addRoomTypeForm.reset(); 
     formMessage.style.display = 'none';
 }
 
+// Hiển thị màn hình Sửa
+function showEditView(roomType) {
+    if (!roomType || !roomType.type_id) {
+        displayMessage('Lỗi: Không thể tải chi tiết loại phòng để sửa.', 'error');
+        showListView();
+        return;
+    }
+    
+    // Cập nhật trạng thái
+    currentEditingRoomTypeId = roomType.type_id;
+
+    // Chuyển sang Form View
+    listView.style.display = 'none';
+    detailView.style.display = 'none';
+    addView.style.display = 'block';
+
+    // 3. Cập nhật UI và Đổ dữ liệu
+    formTitle.textContent = `Sửa Loại phòng: ${roomType.type_name}`;
+    
+    if (formSubmitButton) {
+        formSubmitButton.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 5px;">edit</span> Chỉnh sửa';
+        formSubmitButton.classList.add('warning-button'); 
+    }
+
+    if (typeIdInput) {
+        typeIdInput.value = roomType.type_id;
+        typeIdInput.disabled = true; // KHÔNG được sửa ID
+    }
+    if (typeNameInput) typeNameInput.value = roomType.type_name;
+    if (basePriceInput) basePriceInput.value = roomType.base_price;
+    if (descriptionInput) descriptionInput.value = roomType.description || '';
+    
+    formMessage.style.display = 'none';
+}
 
 // ====================================================================
 // CÁC HÀM RENDER UI
@@ -149,7 +208,7 @@ function renderRoomDetail(roomType) {
         </div>
     `;
     
-    document.getElementById('detail-title').textContent = `Chi tiết Loại Phòng: ${roomType.type_name}`;
+    document.getElementById('detail-title').textContent = `Chi tiết Loại phòng: ${roomType.type_name}`;
     detailContainer.innerHTML = detailHTML;
     
     // Ẩn danh sách, hiển thị chi tiết
@@ -211,6 +270,41 @@ async function loadRoomDetail(id) {
     }
 }
 
+// Tải chi tiết Loại phòng cho chế độ Sửa 
+async function loadRoomTypeForEdit(id) {
+    if (!id) return;
+
+    displayMessage(`Đang tải chi tiết loại phòng ID: ${id}...`, 'info');
+
+    try {
+        const result = await apiFetch(`/roomtype/${id}`, {
+            method: 'GET',
+        });
+        
+        // Backend GET detail thường trả về 1 object (hoặc object trong .data)
+        const roomType = result.roomType || result.data || result; 
+        
+        if (roomType && roomType.type_id) {
+            displayMessage('Tải dữ liệu thành công. Chuyển sang chế độ Sửa.', 'success');
+            showEditView(roomType);
+        } else {
+             throw new Error('Không tìm thấy dữ liệu chi tiết cho loại phòng này.');
+        }
+
+    } catch (error) {
+        console.error('Lỗi khi tải chi tiết Loại Phòng (GET):', error);
+        
+        let errorMessage = `Tải dữ liệu thất bại: ${error.message}`;
+        if (error.status === 404) {
+             errorMessage = 'Không tìm thấy loại phòng cần sửa.';
+        } else if (error.status) {
+             errorMessage = `Tải thất bại: Lỗi HTTP ${error.status}. Vui lòng kiểm tra Console.`;
+        }
+        
+        displayMessage(errorMessage, 'error');
+    }
+}
+
 /**
  * Hàm xử lý Xóa Loại Phòng sau khi xác nhận. 
  * @param {string} id - ID của loại phòng cần xóa.
@@ -259,20 +353,29 @@ async function handleDeleteRoomType(id) {
 }
 
 /**
- * Xử lý submit form Thêm mới Loại Phòng
+ * Xử lý submit form chung (Thêm mới & Chỉnh sửa)
  * @param {Event} event - Sự kiện submit form
  */
-async function handleAddSubmit(event) {
+async function handleSubmitForm(event) {
     event.preventDefault();
     
     formMessage.style.display = 'none';
     
     const form = event.target;
-    const submitButton = form.querySelector('.submit-button');
+    const submitButton = formSubmitButton;
+
+    if (!submitButton) return; 
+
+    const isEditing = currentEditingRoomTypeId !== null;
+    const method = isEditing ? 'PATCH' : 'POST';
+    const endpoint = isEditing 
+        ? `/roomtype/${currentEditingRoomTypeId}` 
+        : `/roomtype`;
+    const actionName = isEditing ? 'Chỉnh sửa' : 'Lưu';
     
     // Tắt nút submit trong khi chờ
     submitButton.disabled = true;
-    submitButton.textContent = 'Đang xử lý...';
+    submitButton.textContent = `Đang xử lý ${actionName}...`;
 
     const priceValue = form.base_price.value.trim();
     const parsedPrice = parseInt(priceValue, 10);
@@ -292,69 +395,70 @@ async function handleAddSubmit(event) {
     if (roomType.base_price <= 0 || isNaN(roomType.base_price)) {
         displayFormMessage('Giá gốc phải là một số nguyên dương.', 'error');
         submitButton.disabled = false;
-        submitButton.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Thêm Mới';
+        submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">${isEditing ? 'edit' : 'save'}</span> ${actionName}`;
         return;
     }
-    if (!roomType.type_id) {
-         displayFormMessage('ID Loại Phòng không được để trống.', 'error');
+    if (!isEditing && !roomType.type_id) {
+         displayFormMessage('ID Loại Phòng không được để trống khi thêm mới.', 'error');
          submitButton.disabled = false;
-         submitButton.innerHTML = '<span class="material-icons" style="margin-right: 5px;">save</span> Thêm Mới';
+         submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">${isEditing ? 'edit' : 'save'}</span> ${actionName}`;
          return;
+    }
+
+    // Chuẩn bị payload cho PATCH (chỉ gửi những trường cần thiết)
+    let payload = {};
+    if (isEditing) {
+        // Chỉ gửi 3 trường được phép sửa theo logic backend
+        payload = {
+            type_name: roomType.type_name,
+            base_price: roomType.base_price,
+            description: roomType.description,
+        };
+    } else {
+        payload = roomType; // Gửi toàn bộ 4 trường cho POST
     }
 
     try {
         // ENDPOINT THÊM MỚI: POST /roomtype
-        const result = await apiFetch('/roomtype', {
-            method: 'POST',
-            body: roomType,
+        const result = await apiFetch(endpoint, {
+            method: method,
+            body: payload,
         });
 
         console.log('API Response (Add Room Type):', result);
 
-        // Giả định nếu API trả về thành công 200/201
-        // Kiểm tra success: true từ response JSON của backend
         if (result && result.success) {
-            displayFormMessage(result.message || 'Thêm loại phòng mới thành công!', 'success');
+            displayMessage(result.message || `${actionName} loại phòng thành công!`, 'success');
         } else {
-             // Trường hợp backend trả về 200/201 nhưng có success: false (Ít xảy ra)
-             throw new Error(result.message || 'Thêm loại phòng thất bại do lỗi không xác định.');
+             throw new Error(result?.message || `${actionName} loại phòng thất bại do lỗi không xác định.`);
         }
-        
-        // Quay lại danh sách sau 1.5 giây
+
+        // Quay lại danh sách
         setTimeout(() => {
             showListView();
         }, 1500);
 
     } catch (error) {
-        // Xử lý lỗi từ API (ví dụ: ID đã tồn tại)
-        console.error('Lỗi khi thêm Loại Phòng:', error);
-
-        let errorMessage = `Thêm mới thất bại: ${error.message}`;
-        let status = error.status || '???';
+        console.error(`Lỗi khi ${actionName} Loại Phòng (${method} - FAILED):`, error);
         
-        // Xử lý lỗi từ API (400, 401, 403, 409, 500)
+        let errorMessage = `${actionName} thất bại: ${error.message}`;
         if (error.status === 409) { 
             errorMessage = error.message || 'Mã loại phòng này đã tồn tại.';
-        } else if (error.status === 400 && error.message) { 
-             errorMessage = error.message;
         } else if (error.status === 403) { 
              errorMessage = error.message || 'Bạn không có quyền thực hiện hành động này (Yêu cầu Admin).';
         } else if (error.status) {
-             // Lỗi Response HTML (400 Bad Request do JSON Double-stringified)
-             if (error.message.includes('Server trả về HTML')) {
-                errorMessage = error.message; 
-             } else {
-                errorMessage = `Thêm mới thất bại: Lỗi HTTP ${status}. Vui lòng kiểm tra Console.`;
-             }
+             errorMessage = `${actionName} thất bại: Lỗi HTTP ${error.status}. Vui lòng kiểm tra Console.`;
         }
         
-        displayFormMessage(`Thêm mới thất bại: ${error.message}`, 'error');
+        displayFormMessage(errorMessage, 'error');
         
     } finally {
         submitButton.disabled = false;
-        submitButton.innerHTML = '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu';
+        submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">${isEditing ? 'edit' : 'save'}</span> ${actionName}`;
     }
 }
+
+
 
 // ====================================================================
 // QUẢN LÝ SỰ KIỆN
@@ -371,8 +475,13 @@ function setupTableEventListeners() {
         });
     });
     
-    // Bạn có thể thêm listener cho nút Edit và Delete ở đây sau
-    // document.querySelectorAll('.edit-btn').forEach(button => { /* ... */ });
+    // Listener cho nút Edit 
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const id = event.currentTarget.dataset.id;
+            loadRoomTypeForEdit(id); // Gọi hàm tải data và chuyển sang Edit View
+        });
+    });
 
     // Listener cho nút Delete
     document.querySelectorAll('.delete-btn').forEach(button => {
@@ -409,7 +518,7 @@ function setupGlobalEventListeners() {
     cancelAddBtn.addEventListener('click', showListView);
 
     // Submit Form Thêm mới
-    addRoomTypeForm.addEventListener('submit', handleAddSubmit);
+    addRoomTypeForm.addEventListener('submit', handleSubmitForm);
 
     // Logic Modal (Sử dụng các element đã tồn tại trong DOM)
     if (modalCancelBtn && modalConfirmBtn && deleteConfirmModal) {

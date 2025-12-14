@@ -59,7 +59,7 @@ const apiFetch = async (endpoint, options = {}) => {
                     localStorage.clear(); 
                     // CHUYỂN HƯỚNG TẠI ĐÂY CHỈ KHI TOKEN ĐÃ HẾT HẠN (tức là có token nhưng lại bị 401/403)
                     if (endpoint !== '/auth/login' && endpoint !== '/register') {
-                        window.location.href = '../../../index.html'; 
+                        window.location.href = '../../index.html'; 
                         // Dừng xử lý tiếp
                         throw new Error("Phiên làm việc đã hết hạn.");
                     }
