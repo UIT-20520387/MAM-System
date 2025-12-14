@@ -57,7 +57,7 @@ router.get('/', requireManager, async (req, res) => {
         // Lấy tất cả căn hộ và JOIN với thông tin loại phòng
         const { data, error } = await supabase
             .from('Apartment')
-            .select('*, RoomType!inner(*), manager_id') 
+            .select('*, room_type:RoomType(type_name), manager_id') 
             .order('apartment_number', { ascending: true }); 
 
         if (error) {
@@ -84,7 +84,7 @@ router.get('/:id', requireManager, async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('Apartment')
-            .select('*, RoomType!inner(*), manager_id') 
+            .select('*, room_type:RoomType(type_name), manager_id') 
             .eq('apartment_id', apartmentId)
             .single();
 

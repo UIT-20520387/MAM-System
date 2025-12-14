@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Apartment Management System</title>
+    <script type="module" src="../../javascript/utils/logout.js"></script>
+    <link rel="stylesheet" href="../../styles/global.css">
+    <link rel="stylesheet" href="../../styles/list-pages.css">
+    <link rel="stylesheet" href="../../styles/detail-pages.css">
+    <link rel="stylesheet" href="../../styles/submit-pages.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+
+<body>
+
+    <!-- NAV MENU -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>MAM System</h1>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav style="flex-grow: 1; padding-top: 16px;">
+
+            <!-- Link Trang chủ -->
+            <div class="nav-link" data-page-name="dashboard.html">
+                <a href="../manager/dashboard.html"><span class="material-symbols-outlined">
+                        space_dashboard
+                    </span>
+                    <span>Trang chủ</span></a>
+            </div>
+
+            <!-- Divider -->
+            <div class="menu-divider">
+                <div class="menu-divider-line"></div>
+            </div>
+
+            <!-- Link Trang chủ -->
+            <div class="nav-link active" data-page-name="room_types.html">
+                <a href="../manager/apartments.html"><span class="material-symbols-outlined">
+                        apartment
+                    </span>
+                    <span>Quản lý Căn hộ</span></a>
+            </div>
+
+            <!-- Divider -->
+            <div class="menu-divider">
+                <div class="menu-divider-line"></div>
+            </div>
+
+            <!-- Button đăng xuất -->
+            <div class="nav-link">
+                <button type="submit" name="logout" id="logoutBtn"><span class="material-symbols-outlined">
+                        logout
+                    </span>Đăng xuất</button>
+            </div>
+
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-container">
+
+        <!-- Header -->
+        <header class="header">
+
+            <!-- Header Title -->
+            <div class="header-title">
+
+                <!-- Icon của trang -->
+                <div class="header-icon-wrapper">
+                    <span class="material-symbols-outlined header-icon">
+                        apartment
+                    </span>
+                </div>
+                <span class="header-page-title">Quản lý Căn hộ</span>
+            </div>
+        </header>
+
+        <!-- Main section -->
+        <section class="main-section">
+            <!-- Card -->
+            <div class="content-area">
+
+                <!-- ---------------------------------------------------- -->
+                <!-- CONTAINER DANH SÁCH (Mặc định hiển thị) -->
+                <!-- ---------------------------------------------------- -->
+                <div id="list-view">
+                    <div class="content-header">
+                        <h2 id="list-title" class="content-title">Danh sách Căn hộ</h2>
+                        <button id="addNewBtn" class="add-button">
+                            <span class="material-symbols-outlined">add</span>
+                            Thêm Căn hộ mới
+                        </button>
+                    </div>
+
+                    <div id="apartment-list">
+                        <!-- Khu vực này sẽ hiển thị bảng dữ liệu hoặc thông báo tải/lỗi -->
+                        <div id="message-area">Đang tải dữ liệu căn hộ...</div>
+                    </div>
+                </div>
+
+                <!-- ---------------------------------------------------- -->
+                <!-- CONTAINER CHI TIẾT (Mặc định ẩn) -->
+                <!-- ---------------------------------------------------- -->
+                <div id="detail-view" style="display: none;">
+                    <div class="content-header">
+                        <h2 id="detail-title" class="content-title">Chi tiết Căn hộ</h2>
+                        <button class="back-button" id="backToListBtn">
+                            <span class="material-symbols-outlined" style="margin-right: 5px;">arrow_back</span>
+                            Quay lại Danh sách
+                        </button>
+                    </div>
+
+                    <div id="detail-container">
+                        <!-- Nội dung chi tiết sẽ được render vào đây -->
+                    </div>
+                </div>
+
+                <!-- ---------------------------------------------------- -->
+                <!-- CONTAINER THÊM MỚI (Mặc định ẩn) -->
+                <!-- ---------------------------------------------------- -->
+                <div id="add-view" style="display: none;">
+                    <h2 id="form-title" class="content-title">Thêm Căn hộ Mới</h2>
+
+                    <form id="addApartmentForm" class="content-card">
+
+                        <div id="form-message" style="display: none;"></div>
+                        <!-- Input: ID -->
+                        <div class="form-group">
+                            <label for="apartment_id" class="form-label">ID Căn hộ:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="apartment_id" name="apartment_id" required maxlength="10">
+                            </div>
+                        </div>
+
+                        <!-- Input: ID Loại phòng-->
+                        <div class="form-group">
+                            <label for="type_id" class="form-label">ID Loại Phòng:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="type_id" name="type_id" required maxlength="10">
+                            </div>
+                        </div>
+
+                        <!-- Input: Số căn hộ -->
+                        <div class="form-group">
+                            <label for="apartment_number" class="form-label">Số căn hộ:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="apartment_number" name="apartment_number" required>
+                            </div>
+                        </div>
+
+                        <!-- Input: Diện tích -->
+                        <div class="form-group">
+                            <label for="area" class="form-label">Diện tích (m2):</label>
+                            <div class="form-input-container">
+                                <input type="text" id="area" name="area" required>
+                            </div>
+                        </div>
+
+                        <!-- Input: Giá -->
+                        <div class="form-group">
+                            <label for="price" class="form-label">Giá (VNĐ/tháng):</label>
+                            <div class="form-input-container">
+                                <input type="number" id="price" name="price" required min="1000">
+                            </div>
+                        </div>
+
+                        <!-- Textarea: Nội thất -->
+                        <div class="form-group" style="border-bottom: none;">
+                            <label for="furniture" class="form-label">Nội thất:</label>
+                            <div class="form-input-container">
+                                <textarea id="furniture" name="furniture" rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Input: Trạng thái -->
+                        <div class="form-group">
+                            <label for="status" class="form-label">Trạng thái:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="status" name="status" required>
+                            </div>
+                        </div>
+
+                        <!-- Nút Hành động -->
+                        <div class="form-action">
+                            <button type="button" class="submit-action cancel-button" id="cancelAddBtn">
+                                <span class="material-symbols-outlined">cancel</span>
+                                Hủy
+                            </button>
+                            <button type="submit" id="form-submit-button" class="submit-action submit-button">
+                                <span class="material-symbols-outlined">save</span>
+                                Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Hộp thoại xác nhận xoá -->
+                <div id="deleteConfirmModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">Xác nhận Xóa</div>
+                        <div class="modal-body">
+                            <p id="modalBodyText">Bạn có chắc chắn muốn xóa căn hộ này?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="modalCancelBtn" class="modal-btn modal-btn-cancel">Hủy</button>
+                            <button id="modalConfirmBtn" class="modal-btn modal-btn-confirm"
+                                data-id-to-delete="">Xóa</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </div>
+
+    </section>
+    </div>
+
+    <script src="../../javascript/config/config.js"></script>
+    <script src="../../javascript/utils/utils.js"></script>
+    <script type="module" src="../../javascript/manager/apartments.js"></script>
+</body>
+
+</html>

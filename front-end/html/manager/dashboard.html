@@ -22,8 +22,8 @@
         <nav style="flex-grow: 1; padding-top: 16px;">
 
             <!-- Link Trang chủ -->
-            <div class="nav-link">
-                <a href="../admin/dashboard.html"><span class="material-symbols-outlined">
+            <div class="nav-link active">
+                <a href="../manager/dashboard.html"><span class="material-symbols-outlined">
                     space_dashboard
                 </span>
                 <span>Trang chủ</span></a>
@@ -35,7 +35,21 @@
                 <div class="menu-divider-line"></div>
             </div>
 
-            <!-- Link đăng xuất -->
+            <!-- Link Trang chủ -->
+            <div class="nav-link">
+                <a href="../manager/apartments.html"><span class="material-symbols-outlined">
+                    apartment
+                </span>
+                <span>Quản lý Căn hộ</span></a>
+                
+            </div>
+
+            <!-- Divider -->
+            <div class="menu-divider">
+                <div class="menu-divider-line"></div>
+            </div>
+
+            <!-- Button đăng xuất -->
             <div class="nav-link">
                 <button type="submit" name="logout" id="logoutBtn"><span class="material-symbols-outlined">
                         logout
@@ -60,7 +74,7 @@
                         space_dashboard
                     </span>
                 </div>
-                <span class="header-text">Trang Chủ</span>
+                <span class="header-page-title">Trang Chủ</span>
             </div>
         </header>
 
@@ -68,10 +82,19 @@
         <section class="main-section">
             <!-- Card -->
             <div class="content-area">
-                <h2 class="content-title">Title</h2>
-                <div class="content-text">
-                    <p>Đây là trang MANAGER</p>
+                <div class="content-header">
+                    <h2 class="content-title">Trang chủ</h2>
+                    <button class="add-button">
+                        <span class="material-symbols-outlined">add</span>
+                        Thêm ...
+                    </button>
                 </div>
+                
+                <div id="...-list">
+                    <!-- Khu vực này sẽ hiển thị bảng dữ liệu hoặc thông báo tải/lỗi -->
+                    <div id="message-area">Đang tải dữ liệu...</div>
+                </div>
+
             </div>
         </section>
     </div>

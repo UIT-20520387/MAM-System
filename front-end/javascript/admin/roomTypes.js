@@ -101,7 +101,7 @@ function showEditView(roomType) {
     detailView.style.display = 'none';
     addView.style.display = 'block';
 
-    // 3. Cập nhật UI và Đổ dữ liệu
+    // Cập nhật UI và Đổ dữ liệu
     formTitle.textContent = `Sửa Loại phòng: ${roomType.type_name}`;
     
     if (formSubmitButton) {
