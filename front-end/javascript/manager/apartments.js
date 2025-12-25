@@ -16,8 +16,8 @@ const cancelAddBtn = document.getElementById("cancelAddBtn");
 const formMessage = document.getElementById("form-message");
 
 // Các phần tử trong Form View
-const formTitle = document.getElementById("form-title"); // Giả định tiêu đề form có ID này
-const formSubmitButton = document.getElementById("form-submit-button"); // Giả định nút submit có ID này
+const formTitle = document.getElementById("form-title"); // Tiêu đề form
+const formSubmitButton = document.getElementById("form-submit-button"); // Nút submit
 
 const apartmentIdInput = document.getElementById("apartment_id"); // Input ID
 const typeIdInput = document.getElementById("type_id"); // Input ID Loại phòng
@@ -113,7 +113,7 @@ function showEditView(apartment) {
 
   if (formSubmitButton) {
     formSubmitButton.innerHTML =
-      '<span class="material-symbols-outlined" style="margin-right: 5px;">edit</span> Chỉnh sửa';
+      '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu';
     formSubmitButton.classList.add("warning-button");
   }
 
@@ -170,13 +170,37 @@ function renderApartments(apartments) {
       ? apartment.room_type.type_name
       : "N/A";
 
+    // Danh sách các trạng thái có thể chọn
+    const statuses = [
+      { value: "Còn trống", label: "Còn trống" },
+      { value: "Đang thuê", label: "Đang thuê" },
+      { value: "Đang bảo trì", label: "Đang bảo trì" },
+    ];
+
+    // Tạo HTML cho Dropdown trạng thái
+    let statusOptions = statuses
+      .map(
+        (s) =>
+          `<option value="${s.value}" ${
+            apartment.status === s.value || apartment.status === s.label
+              ? "selected"
+              : ""
+          }>${s.label}</option>`
+      )
+      .join("");
+
     tableHTML += `
             <tr>
                 <td>${apartment.apartment_id}</td>
                 <td>${apartment.apartment_number}</td>
                 <td>${type_name}</td>
                 <td>${formattedPrice}</td>
-                <td>${apartment.status}</td>
+                
+                <td>
+                    <select class="quick-status-select form-input-container" data-id="${apartment.apartment_id}">
+                        ${statusOptions}
+                    </select>
+                </td>
                 <td>
                     <div class="action-group">
                         <button class="action-btn view-detail-btn" data-id="${apartment.apartment_id}" title="Xem chi tiết">
@@ -352,6 +376,29 @@ async function loadApartmentForEdit(id) {
   }
 }
 
+// Hàm xử lý thay đổi trạng thái
+async function handleStatusChange(id, newStatus) {
+  try {
+    // Gọi API PATCH cập nhật trạng thái
+    // Endpoint: /apartments/:id (truyền object status)
+    const result = await apiFetch(`/apartments/${id}/status`, {
+      method: "PATCH",
+      body: { status: newStatus },
+    });
+
+    if (result && result.success) {
+      displayMessage(`Cập nhật trạng thái căn hộ ${id} thành công!`, "success");
+    } else {
+      throw new Error(result.message || "Cập nhật thất bại.");
+    }
+  } catch (error) {
+    console.error("Lỗi cập nhật trạng thái:", error);
+    displayMessage(`Lỗi: ${error.message}`, "error");
+    // Tải lại danh sách để reset trạng thái hiển thị về đúng dữ liệu gốc nếu lỗi
+    loadApartments();
+  }
+}
+
 // Hàm xử lý Xóa Căn hộ sau khi xác nhận.
 async function handleDeleteApartment(id) {
   if (!id) return;
@@ -427,6 +474,9 @@ async function handleSubmitForm(event) {
   const priceValue = form.price.value.trim();
   const parsedPrice = parseInt(priceValue, 10);
 
+  const statusElement = document.getElementById("status");
+  const currentStatus = statusElement ? statusElement.value : "Còn trống";
+
   // Thu thập dữ liệu form theo yêu cầu database
   const apartment = {
     apartment_id: form.apartment_id.value.trim(),
@@ -436,7 +486,7 @@ async function handleSubmitForm(event) {
     // Chuyển Giá Gốc sang kiểu số nguyên
     price: isNaN(parsedPrice) ? 0 : parsedPrice,
     furniture: form.furniture.value.trim(),
-    status: form.status.value.trim(),
+    status: currentStatus,
   };
 
   console.log("Dữ liệu gửi lên API POST:", apartment);
@@ -445,22 +495,18 @@ async function handleSubmitForm(event) {
   if (apartment.price <= 0 || isNaN(apartment.price)) {
     displayFormMessage("Giá gốc phải là một số nguyên dương.", "error");
     submitButton.disabled = false;
-    submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">${
-      isEditing ? "edit" : "save"
-    }</span> ${actionName}`;
+    submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu`;
     return;
   }
   if (!isEditing && !apartment.apartment_id) {
     displayFormMessage("ID Căn hộ không được để trống khi thêm mới.", "error");
     submitButton.disabled = false;
-    submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">${
-      isEditing ? "edit" : "save"
-    }</span> ${actionName}`;
+    submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu`;
     return;
   }
 
   // Chuẩn bị payload cho PATCH (chỉ gửi những trường cần thiết)
-  let payload = {};
+  let payload = isEditing;
   if (isEditing) {
     // Chỉ gửi 6 trường được phép sửa theo logic backend
     payload = {
@@ -517,9 +563,7 @@ async function handleSubmitForm(event) {
     displayFormMessage(errorMessage, "error");
   } finally {
     submitButton.disabled = false;
-    submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">${
-      isEditing ? "edit" : "save"
-    }</span> ${actionName}`;
+    submitButton.innerHTML = `<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu`;
   }
 }
 
@@ -530,6 +574,15 @@ async function handleSubmitForm(event) {
 // Thiết lập các listener cho các nút trong bảng (View, Edit, Delete).
 // Hàm này phải được gọi lại sau mỗi lần render bảng.
 function setupTableEventListeners() {
+  // Listener cho dropdown thay đổi trạng thái nhanh
+  document.querySelectorAll(".quick-status-select").forEach((select) => {
+    select.addEventListener("change", (event) => {
+      const id = event.target.dataset.id;
+      const newStatus = event.target.value;
+      handleStatusChange(id, newStatus);
+    });
+  });
+
   // Listener cho nút View
   document.querySelectorAll(".view-detail-btn").forEach((button) => {
     button.addEventListener("click", (event) => {
