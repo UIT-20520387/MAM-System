@@ -183,6 +183,66 @@
                     </form>
                 </div>
 
+                <!-- ---------------------------------------------------- -->
+                <!-- CONTAINER GÁN HỢP ĐỒNG (Mặc định ẩn) -->
+                <!-- ---------------------------------------------------- -->
+                <div id="assign-contract-view" style="display: none;">
+                    <h2 id="form-title" class="content-title">Tạo Hợp đồng mới</h2>
+                    <form id="contractForm" class="content-card">
+                        <div id="form-message" style="display: none;"></div>
+
+                        <div class="form-group">
+                            <label class="form-label">Người thuê:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="contract_tenant_name" disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Chọn căn hộ còn trống:</label>
+                            <select class="quick-status-select form-input-container" id="contract_apartment_id" required>
+                                <option value="">-- Chọn căn hộ --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contract_id" class="form-label">ID Hợp đồng:</label>
+                            <div class="form-input-container">
+                                <input type="text" id="contract_id" name="contract_id" required maxlength="4">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Ngày bắt đầu:</label>
+                            <div class="form-input-container">
+                                <input type="date" id="contract_start_date" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Ngày kết thúc:</label>
+                            <div class="form-input-container">
+                                <input type="date" id="contract_end_date" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Tiền cọc (VNĐ):</label>
+                            <div class="form-input-container">
+                                <input type="number" id="contract_deposit" required>
+                            </div>
+                        </div>
+
+                        <div class="form-action">
+                            <button type="button" class="submit-action cancel-button"
+                                id="cancelContractBtn">Hủy</button>
+                            <button type="submit" id="contract-submit-button" class="submit-action submit-button"><span
+                                    class="material-symbols-outlined">save</span>
+                                Lưu</button>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Hộp thoại xác nhận xoá -->
                 <div id="deleteConfirmModal" class="modal-overlay">
                     <div class="modal-content">

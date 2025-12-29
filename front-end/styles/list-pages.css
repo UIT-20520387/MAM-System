@@ -101,6 +101,15 @@
   background-color: var(--color-warning-hover);
 }
 
+/* Nút Assign (Gán hợp đồng) - Xanh lá */
+.assign-btn {
+  background-color: var(--color-primary);
+}
+
+.assign-btn:hover {
+  background-color: var(--color-primary-hover);
+}
+
 /* Nút Delete (Xóa) - Đỏ */
 .delete-btn {
   background-color: var(--color-danger);

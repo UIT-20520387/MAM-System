@@ -4,12 +4,20 @@ import { apiFetch } from "../config/config.js";
 const listView = document.getElementById("list-view");
 const detailView = document.getElementById("detail-view");
 const editView = document.getElementById("edit-view");
+const assignContractView = document.getElementById("assign-contract-view");
+
 const tenantsListContainer = document.getElementById("tenant-list");
 const detailContainer = document.getElementById("detail-container");
 const messageArea = document.getElementById("message-area");
 
 // Các nút và form
-// const addNewBtn = document.getElementById("addNewBtn");
+const contractForm = document.getElementById("contractForm");
+const cancelContractBtn = document.getElementById("cancelContractBtn");
+const contractApartmentSelect = document.getElementById(
+  "contract_apartment_id"
+);
+const contractTenantNameInput = document.getElementById("contract_tenant_name");
+
 const backToListBtn = document.getElementById("backToListBtn");
 const editTenantForm = document.getElementById("editTenantForm");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
@@ -23,6 +31,7 @@ const formSubmitButton = document.getElementById("form-submit-button"); // Nút 
 const fullnameInput = document.getElementById("fullname");
 const phoneInput = document.getElementById("phone_number");
 const identityInput = document.getElementById("identity_card_number");
+const contractIdInput = document.getElementById("contract_id");
 
 // Modal Elements
 const deleteConfirmModal = document.getElementById("deleteConfirmModal");
@@ -54,12 +63,67 @@ function displayFormMessage(message, type = "error") {
   formMessage.style.display = "block";
 }
 
-// Chuyển về chế độ xem danh sách
-function showListView() {
+function hideAllViews() {
+  listView.style.display = "none";
   detailView.style.display = "none";
   editView.style.display = "none";
+  assignContractView.style.display = "none";
+}
+
+// Chuyển về chế độ xem danh sách
+function showListView() {
+  hideAllViews();
   listView.style.display = "block";
+  currentEditingTenantId = null;
   loadTenants();
+}
+
+async function showAssignContractView(tenantId, tenantName) {
+  hideAllViews();
+  assignContractView.style.display = "block";
+  currentEditingTenantId = tenantId;
+  if (contractTenantNameInput) {
+    contractTenantNameInput.value = tenantName;
+  }
+  contractForm.reset();
+  contractTenantNameInput.value = tenantName;
+  formMessage.style.display = "none";
+
+  await loadAvailableApartments();
+}
+
+async function loadAvailableApartments() {
+  try {
+    contractApartmentSelect.innerHTML = '<option value="">Đang tải căn hộ...</option>';
+    
+    const result = await apiFetch("/apartments");
+    
+    // Kiểm tra và lọc căn hộ có trạng thái "Còn trống" 
+    const available = (result.apartments || []).filter(a => {
+      const status = (a.status || "").trim();
+      return status === "Còn trống" || status.toLowerCase() === "available";
+    });
+    
+    contractApartmentSelect.innerHTML = '<option value="">-- Chọn căn hộ --</option>';
+    
+    if (available.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "Không có căn hộ nào còn trống";
+      opt.disabled = true;
+      contractApartmentSelect.appendChild(opt);
+    } else {
+      available.forEach(a => {
+        const opt = document.createElement("option");
+        opt.value = a.apartment_id;
+        opt.textContent = `Phòng ${a.apartment_number} - Giá: ${new Intl.NumberFormat('vi-VN').format(a.price)} VNĐ`;
+        contractApartmentSelect.appendChild(opt);
+      });
+    }
+  } catch (error) {
+    console.error("Lỗi tải căn hộ:", error);
+    contractApartmentSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+  }
 }
 
 async function showDetailView(tenantId) {
@@ -138,13 +202,30 @@ function renderTenants(tenants) {
         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
         <td>
           <div class="action-group">
-            <button class="action-btn view-detail-btn" data-id="${t.user_id}" title="Xem chi tiết">
+            <button class="action-btn view-detail-btn" data-id="${
+              t.user_id
+            }" title="Xem chi tiết">
                 <span class="material-symbols-outlined">visibility</span>
             </button>
-            <button class="action-btn edit-btn" data-tenant-json='${JSON.stringify(t)}' title="Chỉnh sửa">
+            <button class="action-btn edit-btn" data-tenant-json='${JSON.stringify(
+              t
+            )}' title="Chỉnh sửa">
                 <span class="material-symbols-outlined">edit</span>
             </button>
-            <button class="action-btn delete-btn" data-id="${t.user_id}" title="Xóa">
+
+            ${
+              !t.is_currently_tenant
+                ? `
+              <button class="action-btn assign-btn" data-id="${t.user_id}" data-name="${t.fullname}" title="Gán hợp đồng">
+                <span class="material-symbols-outlined">assignment</span>
+              </button>
+            `
+                : ""
+            }
+
+            <button class="action-btn delete-btn" data-id="${
+              t.user_id
+            }" title="Xóa">
                 <span class="material-symbols-outlined">delete</span>
             </button>
           </div>
@@ -194,7 +275,7 @@ function renderTenantDetail(tenant) {
   detailContainer.innerHTML = `
     <div class="detail-content-grid">
         <div class="content-card">
-            <h3 class="section-title">Thông tin Cá nhân</h3>
+            <h3 class="section-title" style="margin-bottom: 20px;">Thông tin Cá nhân</h3>
             <div class="detail-row"><span class="detail-label">Họ tên:</span><span class="detail-value">${
               tenant.fullname
             }</span></div>
@@ -206,7 +287,7 @@ function renderTenantDetail(tenant) {
             }</span></div>
         </div>
         <div class="content-card">
-            <h3 class="section-title">Lịch sử Thuê phòng</h3>
+            <h3 class="section-title" style="margin-bottom: 20px;">Lịch sử Thuê phòng</h3>
             <div class="history-list">${historyHtml}</div>
         </div>
     </div>
@@ -218,6 +299,53 @@ function renderTenantDetail(tenant) {
 // ====================================================================
 
 //Hàm tải dữ liệu Người thuê từ API Backend.
+async function handleContractSubmit(event) {
+  event.preventDefault();
+  formMessage.style.display = "none";
+  const submitBtn = document.getElementById("contract-submit-button");
+
+  const contract_id = contractIdInput ? contractIdInput.value.trim() : "";
+  const apartmentId = contractApartmentSelect.value;
+  if (!apartmentId) {
+    displayFormMessage("Vui lòng chọn một căn hộ.", "error");
+    return;
+  }
+
+  const payload = {
+    contract_id: contract_id, 
+    tenant_id: currentEditingTenantId,
+    apartment_id: apartmentId,
+    start_date: document.getElementById("contract_start_date").value,
+    end_date: document.getElementById("contract_end_date").value,
+    deposit_amount: parseInt(document.getElementById("contract_deposit").value),
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Đang xử lý...";
+
+  try {
+    const result = await apiFetch("/contracts", {
+      method: "POST",
+      body: payload,
+    });
+
+    if (result && result.success) {
+      displayMessage("Gán hợp đồng thành công!", "success");
+      setTimeout(showListView, 1500);
+    } else {
+      throw new Error(result.message || "Lỗi tạo hợp đồng");
+    }
+  } catch (error) {
+    formMessage.textContent = error.message;
+    formMessage.style.display = "block";
+    formMessage.className = "message-error";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML =
+      '<span class="material-symbols-outlined">save</span> Lưu';
+  }
+}
+
 async function loadTenants() {
   try {
     const result = await apiFetch("/tenants");
@@ -292,7 +420,7 @@ function setupTableEventListeners() {
   });
 
   // Nút sửa
-  document.querySelectorAll(".edit-btn").forEach(btn => {
+  document.querySelectorAll(".edit-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       try {
         const tenantData = JSON.parse(btn.dataset.tenantJson);
@@ -303,15 +431,17 @@ function setupTableEventListeners() {
     });
   });
 
+  document.querySelectorAll(".assign-btn").forEach(btn => {
+    btn.onclick = () => showAssignContractView(btn.dataset.id, btn.dataset.name);
+  });
 
   // Nút xóa
-  document.querySelectorAll(".delete-btn").forEach(btn => {
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       modalConfirmBtn.dataset.idToDelete = btn.dataset.id;
       deleteConfirmModal.style.display = "flex";
     });
   });
-
 }
 
 // Thiết lập các listener chung cho cả trang (Nút Quay lại, nút Thêm mới).
@@ -319,6 +449,10 @@ function setupGlobalEventListeners() {
   backToListBtn.addEventListener("click", showListView);
   cancelEditBtn.addEventListener("click", showListView);
   editTenantForm.addEventListener("submit", handleSubmitForm);
+
+  cancelContractBtn.addEventListener("click", showListView);
+  contractForm.addEventListener("submit", handleContractSubmit);
+
 
   // Logic Modal Xóa
   modalCancelBtn.addEventListener("click", () => {
@@ -329,7 +463,6 @@ function setupGlobalEventListeners() {
     const id = modalConfirmBtn.dataset.idToDelete;
     if (id) handleDeleteTenant(id);
   });
-
 }
 
 // ====================================================================
