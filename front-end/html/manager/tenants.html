@@ -26,11 +26,12 @@
         <nav style="flex-grow: 1; padding-top: 16px;">
 
             <!-- Link Trang chủ -->
-            <div class="nav-link" data-page-name="dashboard.html">
+            <div class="nav-link">
                 <a href="../manager/dashboard.html"><span class="material-symbols-outlined">
                         space_dashboard
                     </span>
                     <span>Trang chủ</span></a>
+
             </div>
 
             <!-- Divider -->
@@ -38,12 +39,13 @@
                 <div class="menu-divider-line"></div>
             </div>
 
-            <!-- Link Quản lý Căn hộ -->
-            <div class="nav-link active" data-page-name="room_types.html">
+            <!-- Link Trang chủ -->
+            <div class="nav-link">
                 <a href="../manager/apartments.html"><span class="material-symbols-outlined">
                         apartment
                     </span>
                     <span>Quản lý Căn hộ</span></a>
+
             </div>
 
             <!-- Divider -->
@@ -52,7 +54,7 @@
             </div>
 
             <!-- Link Quản lý Người thuê -->
-            <div class="nav-link">
+            <div class="nav-link active">
                 <a href="../manager/tenants.html"><span class="material-symbols-outlined">
                         person
                     </span>
@@ -87,10 +89,10 @@
                 <!-- Icon của trang -->
                 <div class="header-icon-wrapper">
                     <span class="material-symbols-outlined header-icon">
-                        apartment
+                        person
                     </span>
                 </div>
-                <span class="header-page-title">Quản lý Căn hộ</span>
+                <span class="header-page-title">Quản lý Người thuê</span>
             </div>
         </header>
 
@@ -104,16 +106,16 @@
                 <!-- ---------------------------------------------------- -->
                 <div id="list-view">
                     <div class="content-header">
-                        <h2 id="list-title" class="content-title">Danh sách Căn hộ</h2>
-                        <button id="addNewBtn" class="add-button">
+                        <h2 id="list-title" class="content-title">Danh sách Người thuê</h2>
+                        <!-- <button id="addNewBtn" class="add-button">
                             <span class="material-symbols-outlined">add</span>
-                            Thêm Căn hộ mới
-                        </button>
+                            Thêm Người thuê mới
+                        </button> -->
                     </div>
 
-                    <div id="apartment-list">
+                    <div id="tenant-list">
                         <!-- Khu vực này sẽ hiển thị bảng dữ liệu hoặc thông báo tải/lỗi -->
-                        <div id="message-area">Đang tải dữ liệu căn hộ...</div>
+                        <div id="message-area">Đang tải dữ liệu người thuê...</div>
                     </div>
                 </div>
 
@@ -122,7 +124,7 @@
                 <!-- ---------------------------------------------------- -->
                 <div id="detail-view" style="display: none;">
                     <div class="content-header">
-                        <h2 id="detail-title" class="content-title">Chi tiết Căn hộ</h2>
+                        <h2 id="detail-title" class="content-title">Hồ sơ Người thuê</h2>
                         <button class="back-button" id="backToListBtn">
                             <span class="material-symbols-outlined" style="margin-right: 5px;">arrow_back</span>
                             Quay lại Danh sách
@@ -135,75 +137,41 @@
                 </div>
 
                 <!-- ---------------------------------------------------- -->
-                <!-- CONTAINER THÊM MỚI (Mặc định ẩn) -->
+                <!-- CONTAINER CHỈNH SỬA (Mặc định ẩn) -->
                 <!-- ---------------------------------------------------- -->
-                <div id="add-view" style="display: none;">
-                    <h2 id="form-title" class="content-title">Thêm Căn hộ Mới</h2>
+                <div id="edit-view" style="display: none;">
+                    <h2 id="form-title" class="content-title">Sửa thông tin Người thuê</h2>
 
-                    <form id="addApartmentForm" class="content-card">
+                    <form id="editTenantForm" class="content-card">
 
                         <div id="form-message" style="display: none;"></div>
-                        <!-- Input: ID -->
+                        <!-- Input: Tên -->
                         <div class="form-group">
-                            <label for="apartment_id" class="form-label">ID Căn hộ:</label>
+                            <label for="fullname" class="form-label">Họ tên:</label>
                             <div class="form-input-container">
-                                <input type="text" id="apartment_id" name="apartment_id" required maxlength="10">
+                                <input type="text" id="fullname" name="fullname">
                             </div>
                         </div>
 
-                        <!-- Input: ID Loại phòng-->
+                        <!-- Input: SĐT -->
                         <div class="form-group">
-                            <label for="type_id" class="form-label">ID Loại Phòng:</label>
+                            <label for="phone_number" class="form-label">SĐT:</label>
                             <div class="form-input-container">
-                                <input type="text" id="type_id" name="type_id" required maxlength="10">
+                                <input type="tel" id="phone_number" name="phone_number" required maxlength="10">
                             </div>
                         </div>
 
-                        <!-- Input: Số căn hộ -->
+                        <!-- Identity Card -->
                         <div class="form-group">
-                            <label for="apartment_number" class="form-label">Số căn hộ:</label>
+                            <label for="identity_card_number" class="form-label">Số CCCD/CMND:</label>
                             <div class="form-input-container">
-                                <input type="text" id="apartment_number" name="apartment_number" required>
+                                <input type="text" id="identity_card_number" name="identity_card_number">
                             </div>
-                        </div>
-
-                        <!-- Input: Diện tích -->
-                        <div class="form-group">
-                            <label for="area" class="form-label">Diện tích (m2):</label>
-                            <div class="form-input-container">
-                                <input type="text" id="area" name="area" required>
-                            </div>
-                        </div>
-
-                        <!-- Input: Giá -->
-                        <div class="form-group">
-                            <label for="price" class="form-label">Giá (VNĐ/tháng):</label>
-                            <div class="form-input-container">
-                                <input type="number" id="price" name="price" required min="1000">
-                            </div>
-                        </div>
-
-                        <!-- Textarea: Nội thất -->
-                        <div class="form-group" style="border-bottom: none;">
-                            <label for="furniture" class="form-label">Nội thất:</label>
-                            <div class="form-input-container">
-                                <textarea id="furniture" name="furniture" rows="4"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Input: Trạng thái -->
-                        <div class="form-group">
-                            <label for="status" class="form-label">Trạng thái:</label>
-                            <select class="quick-status-select form-input-container" name="status" id="status">
-                                <option value="Còn trống">Còn trống</option>
-                                <option value="Đang thuê">Đang thuê</option>
-                                <option value="Đang bảo trì">Đang bảo trì</option>
-                            </select>
                         </div>
 
                         <!-- Nút Hành động -->
                         <div class="form-action">
-                            <button type="button" class="submit-action cancel-button" id="cancelAddBtn">
+                            <button type="button" class="submit-action cancel-button" id="cancelEditBtn">
                                 <span class="material-symbols-outlined">cancel</span>
                                 Hủy
                             </button>
@@ -220,7 +188,7 @@
                     <div class="modal-content">
                         <div class="modal-header">Xác nhận Xóa</div>
                         <div class="modal-body">
-                            <p id="modalBodyText">Bạn có chắc chắn muốn xóa căn hộ này?</p>
+                            <p id="modalBodyText">Bạn có chắc chắn muốn xóa tài khoản người thuê này?</p>
                         </div>
                         <div class="modal-footer">
                             <button id="modalCancelBtn" class="modal-btn modal-btn-cancel">Hủy</button>
@@ -238,7 +206,8 @@
 
     <script src="../../javascript/config/config.js"></script>
     <script src="../../javascript/utils/utils.js"></script>
-    <script type="module" src="../../javascript/manager/apartments.js"></script>
+    <script type="module" src="../../javascript/manager/tenants.js"></script>
+
 </body>
 
 </html>

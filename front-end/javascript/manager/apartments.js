@@ -27,8 +27,6 @@ const priceInput = document.getElementById("price"); // Input Giá
 const furnitureInput = document.getElementById("furniture"); // Input Mô tả nội thất
 const statusInput = document.getElementById("status"); // Input Trạng thái
 
-// const typeNameInput = document.getElementById('type_name'); // Input Tên
-
 // Modal Elements
 const deleteConfirmModal = document.getElementById("deleteConfirmModal");
 const modalConfirmBtn = document.getElementById("modalConfirmBtn");
@@ -81,7 +79,6 @@ function showAddView() {
   if (formSubmitButton) {
     formSubmitButton.innerHTML =
       '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu';
-    formSubmitButton.classList.remove("warning-button");
   }
   if (apartmentIdInput) {
     apartmentIdInput.disabled = false; // Bật ID để thêm mới
@@ -114,7 +111,6 @@ function showEditView(apartment) {
   if (formSubmitButton) {
     formSubmitButton.innerHTML =
       '<span class="material-symbols-outlined" style="margin-right: 5px;">save</span> Lưu';
-    formSubmitButton.classList.add("warning-button");
   }
 
   if (apartmentIdInput) {
@@ -153,7 +149,7 @@ function renderApartments(apartments) {
                     <th>Số căn hộ</th>
                     <th>Loại phòng</th>
                     <th>Giá (VNĐ/tháng)</th>
-                    <th>Trạng thái </th>
+                    <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
@@ -339,7 +335,7 @@ async function loadApartmentDetail(id) {
   }
 }
 
-// Tải chi tiết Loại phòng cho chế độ Sửa
+// Tải chi tiết Căn hộ cho chế độ Sửa
 async function loadApartmentForEdit(id) {
   if (!id) return;
 
@@ -677,6 +673,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Thiết lập các listener cố định (Quay lại, Thêm mới)
   setupGlobalEventListeners();
 
-  // Tải dữ liệu loại phòng
+  // Tải dữ liệu căn hộ
   loadApartments();
 });

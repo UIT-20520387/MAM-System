@@ -7,7 +7,7 @@ const { requireManager } = require('../../middlewares/authMiddleware.js');
 // ROUTE QUẢN LÝ NGƯỜI THUÊ (TENANT) - CHỈ MANAGER
 // ======================================================================
 
-// Lấy hơp đồng đang hoạt động của Tenant
+// Lấy hợp đồng đang hoạt động của Tenant
 const getActiveContractDetails = async (tenantId) => {
     // Tìm hợp đồng đang hoạt động (is_active = true)
     const { data: contract, error } = await supabase

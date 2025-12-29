@@ -1,3 +1,12 @@
+/* Trường dữ liệu */
+.form-group {
+  margin: 20px 10px;
+}
+
+.form-label {
+  margin: 0 5px;
+}
+
 /* Nút Submit (Dùng màu Primary) */
 .submit-action {
   color: white;
@@ -18,15 +27,6 @@
   background-color: var(--color-primary-hover);
   transform: translateY(-1px);
 }
-
-/* .warning-button {
-    background-color: var(--color-warning); 
-}
-
-.warning-button:hover {
-    background-color: var(--color-warning-hover); 
-    transform: translateY(-1px); 
-} */
 
 .cancel-button {
   background-color: var(--color-secondary);
@@ -57,6 +57,10 @@
 .form-input-container textarea {
   resize: vertical;
   min-height: 100px;
+}
+
+.form-input-container {
+  margin: 5px;
 }
 
 /* Style cho button submit */
