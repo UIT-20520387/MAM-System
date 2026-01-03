@@ -213,47 +213,47 @@ router.patch('/:id', requireManager, async (req, res) => {
 });
 
 // DELETE /api/tenants/:id - XOÁ NGƯỜI THUÊ
-router.delete('/:id', requireManager, async (req, res) => {
-    const tenantId = req.params.id;
+// router.delete('/:id', requireManager, async (req, res) => {
+//     const tenantId = req.params.id;
 
-    try {
-        // BƯỚC 1: Kiểm tra xem người thuê có hợp đồng thuê NHIỆM KỲ DÀI đang hoạt động không
-        const { data: activeContracts, error: contractError } = await supabase
-            .from('Contract')
-            .select('contract_id')
-            .eq('tenant_id', tenantId)
-            .eq('is_active', true); // Giả định trường is_active xác định hợp đồng đang hiệu lực
+//     try {
+//         // BƯỚC 1: Kiểm tra xem người thuê có hợp đồng thuê NHIỆM KỲ DÀI đang hoạt động không
+//         const { data: activeContracts, error: contractError } = await supabase
+//             .from('Contract')
+//             .select('contract_id')
+//             .eq('tenant_id', tenantId)
+//             .eq('is_active', true); // Giả định trường is_active xác định hợp đồng đang hiệu lực
 
-        if (contractError) {
-             console.error("Lỗi DB khi kiểm tra hợp đồng:", contractError.message);
-             return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi kiểm tra hợp đồng.' });
-        }
+//         if (contractError) {
+//              console.error("Lỗi DB khi kiểm tra hợp đồng:", contractError.message);
+//              return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi kiểm tra hợp đồng.' });
+//         }
         
-        if (activeContracts && activeContracts.length > 0) {
-            // Không được xóa nếu còn hợp đồng đang hoạt động
-            return res.status(409).json({ success: false, message: `Không thể xóa người thuê. Người này hiện có ${activeContracts.length} hợp đồng đang hoạt động.` });
-        }
+//         if (activeContracts && activeContracts.length > 0) {
+//             // Không được xóa nếu còn hợp đồng đang hoạt động
+//             return res.status(409).json({ success: false, message: `Không thể xóa người thuê. Người này hiện có ${activeContracts.length} hợp đồng đang hoạt động.` });
+//         }
 
-        // BƯỚC 2: Xóa tài khoản khỏi Supabase Auth (Điều này sẽ tự động xóa TenantProfile nếu có RLS/trigger/FK)
-        // **Lưu ý:** Chỉ Admin API mới có quyền xóa user.
-        const { error: authError } = await supabase.auth.admin.deleteUser(tenantId);
+//         // BƯỚC 2: Xóa tài khoản khỏi Supabase Auth (Điều này sẽ tự động xóa TenantProfile nếu có RLS/trigger/FK)
+//         // **Lưu ý:** Chỉ Admin API mới có quyền xóa user.
+//         const { error: authError } = await supabase.auth.admin.deleteUser(tenantId);
 
-        if (authError) {
-            if (authError.message.includes('not found')) {
-                return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản người thuê để xóa.' });
-            }
-            console.error("Lỗi Auth Supabase (Xóa User):", authError.message);
-            return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi xóa tài khoản người thuê.' });
-        }
+//         if (authError) {
+//             if (authError.message.includes('not found')) {
+//                 return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản người thuê để xóa.' });
+//             }
+//             console.error("Lỗi Auth Supabase (Xóa User):", authError.message);
+//             return res.status(500).json({ success: false, message: 'Lỗi hệ thống khi xóa tài khoản người thuê.' });
+//         }
         
-        return res.status(200).json({
-            success: true,
-            message: `Người thuê UID ${tenantId} và hồ sơ liên quan đã được xóa thành công.`
-        });
-    } catch (error) {
-        console.error("Lỗi hệ thống khi xóa người thuê:", error);
-        res.status(500).json({ success: false, message: 'Lỗi hệ thống.' });
-    }
-});
+//         return res.status(200).json({
+//             success: true,
+//             message: `Người thuê UID ${tenantId} và hồ sơ liên quan đã được xóa thành công.`
+//         });
+//     } catch (error) {
+//         console.error("Lỗi hệ thống khi xóa người thuê:", error);
+//         res.status(500).json({ success: false, message: 'Lỗi hệ thống.' });
+//     }
+// });
 
 module.exports = router;

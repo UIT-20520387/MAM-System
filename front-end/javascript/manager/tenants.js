@@ -34,9 +34,9 @@ const identityInput = document.getElementById("identity_card_number");
 const contractIdInput = document.getElementById("contract_id");
 
 // Modal Elements
-const deleteConfirmModal = document.getElementById("deleteConfirmModal");
-const modalConfirmBtn = document.getElementById("modalConfirmBtn");
-const modalCancelBtn = document.getElementById("modalCancelBtn");
+// const deleteConfirmModal = document.getElementById("deleteConfirmModal");
+// const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+// const modalCancelBtn = document.getElementById("modalCancelBtn");
 // const modalBodyText = document.getElementById("modalBodyText");
 
 // BIẾN TRẠNG THÁI
@@ -180,7 +180,7 @@ function renderTenants(tenants) {
           <th>Số điện thoại</th>
           <th>Số CCCD</th>
           <th>Trạng thái</th>
-          <th>Thao tác</th>
+          <th>Hành động</th>
         </tr>
       </thead>
       <tbody>
@@ -222,12 +222,6 @@ function renderTenants(tenants) {
             `
                 : ""
             }
-
-            <button class="action-btn delete-btn" data-id="${
-              t.user_id
-            }" title="Xóa">
-                <span class="material-symbols-outlined">delete</span>
-            </button>
           </div>
         </td>
       </tr>
@@ -391,21 +385,21 @@ async function handleSubmitForm(event) {
   }
 }
 
-async function handleDeleteTenant(id) {
-  try {
-    const result = await apiFetch(`/tenants/${id}`, { method: "DELETE" });
-    if (result && result.success) {
-      displayMessage("Đã xóa người thuê thành công.", "success");
-      deleteConfirmModal.style.display = "none";
-      loadTenants();
-    } else {
-      throw new Error(result.message);
-    }
-  } catch (error) {
-    displayMessage("Lỗi: " + error.message, "error");
-    deleteConfirmModal.style.display = "none";
-  }
-}
+// async function handleDeleteTenant(id) {
+//   try {
+//     const result = await apiFetch(`/tenants/${id}`, { method: "DELETE" });
+//     if (result && result.success) {
+//       displayMessage("Đã xóa người thuê thành công.", "success");
+//       deleteConfirmModal.style.display = "none";
+//       loadTenants();
+//     } else {
+//       throw new Error(result.message);
+//     }
+//   } catch (error) {
+//     displayMessage("Lỗi: " + error.message, "error");
+//     deleteConfirmModal.style.display = "none";
+//   }
+// }
 
 // ====================================================================
 // QUẢN LÝ SỰ KIỆN
@@ -436,12 +430,12 @@ function setupTableEventListeners() {
   });
 
   // Nút xóa
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      modalConfirmBtn.dataset.idToDelete = btn.dataset.id;
-      deleteConfirmModal.style.display = "flex";
-    });
-  });
+  // document.querySelectorAll(".delete-btn").forEach((btn) => {
+  //   btn.addEventListener("click", () => {
+  //     modalConfirmBtn.dataset.idToDelete = btn.dataset.id;
+  //     deleteConfirmModal.style.display = "flex";
+  //   });
+  // });
 }
 
 // Thiết lập các listener chung cho cả trang (Nút Quay lại, nút Thêm mới).
@@ -455,14 +449,14 @@ function setupGlobalEventListeners() {
 
 
   // Logic Modal Xóa
-  modalCancelBtn.addEventListener("click", () => {
-    deleteConfirmModal.style.display = "none";
-  });
+  // modalCancelBtn.addEventListener("click", () => {
+  //   deleteConfirmModal.style.display = "none";
+  // });
 
-  modalConfirmBtn.addEventListener("click", () => {
-    const id = modalConfirmBtn.dataset.idToDelete;
-    if (id) handleDeleteTenant(id);
-  });
+  // modalConfirmBtn.addEventListener("click", () => {
+  //   const id = modalConfirmBtn.dataset.idToDelete;
+  //   if (id) handleDeleteTenant(id);
+  // });
 }
 
 // ====================================================================
