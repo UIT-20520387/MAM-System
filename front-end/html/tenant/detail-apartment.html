@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Căn hộ - Tenant View</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfd; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .feature-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #f1f5f9; color: #475569; }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600">home_work</span>
+                <span class="font-bold text-xl tracking-tight">MAM System</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="#" class="text-sm font-medium hover:text-blue-600">Trang chủ</a>
+                <a href="#" class="text-sm font-medium text-blue-600">Căn hộ của tôi</a>
+                <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Header & Breadcrumb -->
+        <div class="mb-6">
+            <div class="flex items-center gap-2 text-slate-500 text-sm mb-2">
+                <span>Căn hộ</span>
+                <span class="material-symbols-outlined text-xs">chevron_right</span>
+                <span class="text-slate-900 font-medium">Chi tiết phòng 101</span>
+            </div>
+            <div class="flex justify-between items-end">
+                <h1 class="text-3xl font-bold">Căn hộ 101</h1>
+                <div class="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-green-600"></span>
+                    Đang thuê
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Placeholder -->
+        <div class="grid grid-cols-4 grid-rows-2 gap-4 h-[400px] mb-8 overflow-hidden rounded-2xl">
+            <div class="col-span-2 row-span-2 bg-slate-200 relative">
+                <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover" alt="Main Room">
+            </div>
+            <div class="bg-slate-200">
+                <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=500" class="w-full h-full object-cover" alt="Kitchen">
+            </div>
+            <div class="bg-slate-200">
+                <img src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&q=80&w=500" class="w-full h-full object-cover" alt="Decor">
+            </div>
+            <div class="col-span-2 bg-slate-200">
+                <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover" alt="Bathroom">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Details -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Quick Info -->
+                <div class="grid grid-cols-3 gap-4 border-b pb-8">
+                    <div class="flex flex-col">
+                        <span class="text-slate-500 text-sm">Diện tích</span>
+                        <span class="font-semibold text-lg">10.5 m²</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-slate-500 text-sm">Loại phòng</span>
+                        <span class="font-semibold text-lg">Phòng đơn</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Mô tả căn hộ</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Căn hộ tọa lạc tại tầng 1 với view thoáng mát. Được trang bị đầy đủ nội thất hiện đại bao gồm giường tủ gỗ sồi, điều hòa Inverter tiết kiệm điện, khu vực bếp riêng biệt có máy hút mùi và phòng tắm vách kính cao cấp. Phù hợp cho người đi làm hoặc sinh viên cần không gian yên tĩnh và tiện nghi.
+                    </p>
+                </div>
+
+                <!-- Amenities -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Tiện ích đi kèm</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                        <div class="flex items-center gap-3">
+                            <div class="feature-icon"><span class="material-symbols-outlined">wifi</span></div>
+                            <span class="text-sm font-medium">Wi-Fi Tốc độ cao</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="feature-icon"><span class="material-symbols-outlined">ac_unit</span></div>
+                            <span class="text-sm font-medium">Điều hòa</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="feature-icon"><span class="material-symbols-outlined">local_laundry_service</span></div>
+                            <span class="text-sm font-medium">Máy giặt chung</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="feature-icon"><span class="material-symbols-outlined">security</span></div>
+                            <span class="text-sm font-medium">Khóa vân tay</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="feature-icon"><span class="material-symbols-outlined">directions_car</span></div>
+                            <span class="text-sm font-medium">Hầm gửi xe</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="feature-icon"><span class="material-symbols-outlined">camera_outdoor</span></div>
+                            <span class="text-sm font-medium">Camera an ninh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar Contract Info -->
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-2xl border shadow-xl shadow-slate-200/50 sticky top-24">
+                    <h4 class="text-lg font-bold mb-6">Thông tin hợp đồng</h4>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between items-center py-2 border-b border-dashed">
+                            <span class="text-slate-500">Giá thuê</span>
+                            <span class="font-bold text-blue-600">4,500,000đ/tháng</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-dashed">
+                            <span class="text-slate-500">Ngày bắt đầu</span>
+                            <span class="font-medium text-slate-800">01/12/2025</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-dashed">
+                            <span class="text-slate-500">Ngày kết thúc</span>
+                            <span class="font-medium text-slate-800">31/12/2026</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-slate-500">Số tiền cọc</span>
+                            <span class="font-medium text-slate-800">9,000,000đ</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-xl mb-6">
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-blue-600">info</span>
+                            <p class="text-xs text-blue-700 leading-normal">
+                                Mọi yêu cầu hỗ trợ sửa chữa thiết bị trong phòng, vui lòng sử dụng chức năng <strong>Báo cáo sự cố</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-300">
+                        Liên hệ Quản lý
+                    </button>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="#" class="text-sm text-slate-400 underline underline-offset-4">Xem hợp đồng gốc (PDF)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
