@@ -44,7 +44,7 @@ router.get('/due-apartments', requireManager, async (req, res) => {
                 contract_id,
                 start_date,
                 apartment:Apartment(apartment_id, apartment_number),
-                tenant:TenantProfile(full_name)
+                tenant:TenantProfile(fullname)
             `)
             .eq('is_active', true);
 
@@ -73,7 +73,7 @@ router.get('/due-apartments', requireManager, async (req, res) => {
             result.push({
                 apartment_id: c.apartment.apartment_id,
                 apartment_number: c.apartment.apartment_number,
-                tenant_name: c.tenant.full_name,
+                tenant_name: c.tenant.fullname,
                 contract_id: c.contract_id,
                 is_first_month: isFirstMonth
             });
