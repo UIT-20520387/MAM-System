@@ -41,6 +41,8 @@ const roomTypeRoutes = require('./routes/admin/roomTypeRoutes');
 const apartmentRoutes = require('./routes/manager/apartmentRoutes');
 const tenantRoutes = require('./routes/manager/tenantRoutes');
 const contractRoutes = require('./routes/manager/contractRoutes');
+const financeRoutes = require('./routes/manager/financeRoutes');
+const serviceRoutes = require('./routes/manager/serviceRoutes');
 
 
 // app.use(cors(corsOptions));
@@ -59,6 +61,8 @@ app.use('/api/roomtype', roomTypeRoutes);
 app.use('/api/apartments', apartmentRoutes);
 app.use('/api/tenants', tenantRoutes);
 app.use('/api/contracts', contractRoutes);
+app.use('/api/finance', financeRoutes);
+app.use('/api/services', serviceRoutes);
 
 // Tenant routes
 
