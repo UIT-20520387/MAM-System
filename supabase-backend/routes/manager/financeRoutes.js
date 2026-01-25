@@ -67,10 +67,13 @@ router.get("/due-apartments", requireManager, async (req, res) => {
 
       if (billExists) continue;
 
-      const startMonth = new Date(c.start_date);
-      const isFirstMonth =
-        startMonth.getFullYear() === billingMonth.getFullYear() &&
-        startMonth.getMonth() === billingMonth.getMonth();
+      // Kiểm tra đã từng có bill nào trước đây chưa
+      const { count: billCount } = await supabase
+        .from("Bill")
+        .select("*", { count: "exact", head: true })
+        .eq("contract_id", c.contract_id);
+
+      const isFirstMonth = billCount === 0;
 
       result.push({
         apartment_id: c.apartment.apartment_id,
@@ -136,7 +139,7 @@ router.get("/prepare-billing", requireManager, async (req, res) => {
         .select("end_index")
         .eq("apartment_id", apartment_id)
         .eq("utility_id", u.utility_id)
-        .lt("reading_month", billingMonth.toISOString().slice(0, 10))
+        .lte("reading_month", billingMonth.toISOString().slice(0, 10))
         .order("reading_month", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -157,10 +160,10 @@ router.get("/prepare-billing", requireManager, async (req, res) => {
         `end_month.is.null,end_month.gte.${billingMonth.toISOString().slice(0, 10)}`,
       );
 
-    const startMonth = new Date(contract.start_date);
-    const isFirstMonth =
-      startMonth.getFullYear() === billingMonth.getFullYear() &&
-      startMonth.getMonth() === billingMonth.getMonth();
+    const startMonth = contract.start_date.slice(0, 7); // YYYY-MM
+    const billingMonthStr = billingMonth.toISOString().slice(0, 7); // YYYY-MM
+
+    const isFirstMonth = startMonth === billingMonthStr;
 
     res.json({
       success: true,
@@ -238,8 +241,10 @@ router.post("/bill", requireManager, async (req, res) => {
         .from("UtilityReading")
         .select("end_index")
         .eq("apartment_id", apartment_id)
+        // .lt("reading_month", billingMonth)
         .eq("utility_id", utility_id)
         .order("reading_month", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
@@ -282,6 +287,40 @@ router.post("/bill", requireManager, async (req, res) => {
       });
     }
 
+    /* ---- Phí dịch vụ (ContractService) ---- */
+    const { data: contractServices } = await supabase
+      .from("ContractService")
+      .select(
+        `
+    service_id,
+    Service (
+      name,
+      price
+    )
+  `,
+      )
+      .eq("contract_id", contract.contract_id)
+      .lte("start_month", billingMonth)
+      .or(
+        `end_month.is.null,end_month.gte.${billingMonth}`,
+      );
+
+    if (contractServices && contractServices.length > 0) {
+      for (const cs of contractServices) {
+        const serviceName = cs.Service?.name;
+        const servicePrice = cs.Service?.price ?? 0;
+
+        if (servicePrice > 0) {
+          billDetails.push({
+            item_name: serviceName,
+            amount: servicePrice,
+          });
+
+          totalAmount += servicePrice;
+        }
+      }
+    }
+
     /* =========================
        5. TIỀN CỌC / TIỀN THUÊ
     ========================= */
@@ -308,8 +347,7 @@ router.post("/bill", requireManager, async (req, res) => {
     /* =========================
        6. TẠO BILL
     ========================= */
-    const dueDate = new Date(billingMonth);
-    dueDate.setDate(10); // ví dụ: hạn thanh toán ngày 10
+    const dueDate = billingMonth.slice(0, 7) + "-10";
 
     const { data: bill } = await supabase
       .from("Bill")
@@ -318,7 +356,7 @@ router.post("/bill", requireManager, async (req, res) => {
         billing_month: billingMonth,
         total_amount: totalAmount,
         status: "Chưa thanh toán",
-        due_date: dueDate.toISOString().slice(0, 10),
+        due_date: dueDate,
       })
       .select()
       .single();
@@ -338,174 +376,12 @@ router.post("/bill", requireManager, async (req, res) => {
       message: "Tạo hoá đơn thành công",
       bill_id: bill.bill_id,
       total_amount: totalAmount,
+      is_first_month: isFirstBill,
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: err.message });
   }
-
-  // const businessDate = await getBusinessDate();
-  // const billingMonth = getBillingMonth(businessDate);
-
-  // Lấy hợp đồng
-  // const { data: contract } = await supabase
-  //   .from("Contract")
-  //   .select("*")
-  //   .eq("apartment_id", apartment_id)
-  //   .eq("is_active", true)
-  //   .single();
-
-  // if (!contract) {
-  //   return res
-  //     .status(404)
-  //     .json({ success: false, message: "Không có hợp đồng hợp lệ" });
-  // }
-
-  // Check bill tồn tại
-  // const { data: existedBill } = await supabase
-  //   .from("Bill")
-  //   .select("bill_id")
-  //   .eq("contract_id", contract.contract_id)
-  //   .eq("billing_month", billingMonth.toISOString().slice(0, 10))
-  //   .maybeSingle();
-
-  // if (existedBill) {
-  //   return res
-  //     .status(409)
-  //     .json({ success: false, message: "Hoá đơn đã tồn tại" });
-  // }
-
-  // let total = 0;
-  // const billDetails = [];
-
-  // ========== Utility ==========
-  //     for (const r of utility_readings) {
-  //       const { utility_id, end_index } = r;
-
-  //       const { data: lastReading } = await supabase
-  //         .from("UtilityReading")
-  //         .select("end_index")
-  //         .eq("apartment_id", apartment_id)
-  //         .eq("utility_id", utility_id)
-  //         .lt("reading_month", billingMonth.toISOString().slice(0, 10))
-  //         .order("reading_month", { ascending: false })
-  //         .limit(1)
-  //         .maybeSingle();
-
-  //       const start_index = lastReading ? lastReading.end_index : 0;
-  //       const usage = end_index - start_index;
-
-  //       if (usage < 0) {
-  //         return res
-  //           .status(400)
-  //           .json({ success: false, message: "Chỉ số không hợp lệ" });
-  //       }
-
-  //       const { data: rate } = await supabase
-  //         .from("UtilityRate")
-  //         .select("unit_price")
-  //         .eq("utility_id", utility_id)
-  //         .lte("effective_from", billingMonth.toISOString().slice(0, 10))
-  //         .or(
-  //           `effective_to.is.null,effective_to.gte.${billingMonth.toISOString().slice(0, 10)}`,
-  //         )
-  //         .order("effective_from", { ascending: false })
-  //         .limit(1)
-  //         .single();
-
-  //       const amount = usage * rate.unit_price;
-  //       total += amount;
-
-  //       billDetails.push({
-  //         item_name: `Tiền ${utility_id}`,
-  //         amount,
-  //       });
-
-  //       await supabase.from("UtilityReading").insert({
-  //         apartment_id,
-  //         utility_id,
-  //         reading_month: billingMonth,
-  //         start_index,
-  //         end_index,
-  //         manager_id: req.user.id,
-  //       });
-  //     }
-
-  //     // ========== Dịch vụ ==========
-  //     const { data: services } = await supabase
-  //       .from("ContractService")
-  //       .select("service:Service(name, price)")
-  //       .eq("contract_id", contract.contract_id)
-  //       .lte("start_month", billingMonth.toISOString().slice(0, 10))
-  //       .or(
-  //         `end_month.is.null,end_month.gte.${billingMonth.toISOString().slice(0, 10)}`,
-  //       );
-
-  //     for (const s of services) {
-  //       total += s.service.price;
-  //       billDetails.push({
-  //         item_name: s.service.name,
-  //         amount: s.service.price,
-  //       });
-  //     }
-
-  //     // ========== Cọc & thuê ==========
-  //     const startMonth = new Date(contract.start_date);
-  //     const isFirstMonth =
-  //       startMonth.getFullYear() === billingMonth.getFullYear() &&
-  //       startMonth.getMonth() === billingMonth.getMonth();
-
-  //     if (isFirstMonth && contract.deposit_amount > 0) {
-  //       total += contract.deposit_amount;
-  //       billDetails.push({
-  //         item_name: "Tiền cọc",
-  //         amount: contract.deposit_amount,
-  //       });
-  //     }
-
-  //     if (!isFirstMonth) {
-  //       const { data: apartment } = await supabase
-  //         .from("Apartment")
-  //         .select("price")
-  //         .eq("apartment_id", apartment_id)
-  //         .single();
-
-  //       total += apartment.price;
-  //       billDetails.push({
-  //         item_name: "Tiền thuê nhà",
-  //         amount: apartment.price,
-  //       });
-  //     }
-
-  //     // ========== Tạo Bill ==========
-  //     const { data: bill } = await supabase
-  //       .from("Bill")
-  //       .insert({
-  //         contract_id: contract.contract_id,
-  //         billing_month: billingMonth,
-  //         total_amount: total,
-  //         status: "CHUA_THANH_TOAN",
-  //       })
-  //       .select()
-  //       .single();
-
-  //     // ========== BillDetail ==========
-  //     for (const d of billDetails) {
-  //       await supabase.from("BillDetail").insert({
-  //         bill_id: bill.bill_id,
-  //         item_name: d.item_name,
-  //         amount: d.amount,
-  //       });
-  //     }
-
-  //     res.json({
-  //       success: true,
-  //       bill_id: bill.bill_id,
-  //       total_amount: total,
-  //     });
-  //   } catch (err) {
-  //     res.status(500).json({ success: false, message: err.message });
-  //   }
 });
 
 module.exports = router;
