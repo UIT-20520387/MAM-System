@@ -50,7 +50,7 @@ function renderApartmentList(apartments) {
       <tr>
         <td>${a.apartment_id}</td>
         <td>${a.tenant_name}</td>
-        <td>${a.is_first_month ? "✔" : ""}</td>
+        <td>${a.is_first_month ? "Phải" : "Không phải"}</td>
         <td>
           <button class="action-btn assign-btn" data-id="${a.apartment_id}" title ="Tính phí">
             <span class="material-symbols-outlined">request_quote</span>
