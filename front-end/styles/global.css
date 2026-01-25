@@ -31,6 +31,9 @@
   box-sizing: border-box;
   font-family: "Noto Sans", sans-serif;
 }
+ul {
+  list-style: none;
+}
 
 body {
   min-height: 100vh;

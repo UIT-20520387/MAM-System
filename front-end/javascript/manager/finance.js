@@ -98,20 +98,21 @@ function renderBillingModal(data) {
       <div class="form-group">
         <label>${u.utility_id} (chỉ số mới)</label>
         <input type="number" data-utility="${u.utility_id}" required />
-        <small>Chỉ số cũ: ${u.last_end_index ?? 0}</small>
       </div>
     `;
   });
 
+  const isFirstMonth = data.is_first_month === true || data.is_first_month === "true" || data.is_first_month === 1;
+
   if (data.services.length) {
     html += "<h4>Dịch vụ</h4><ul>";
     data.services.forEach(s => {
-      html += `<li>${s.name} - ${s.price.toLocaleString()} VNĐ</li>`;
+      html += `<li>${s.name}: ${s.price.toLocaleString()} VNĐ</li>`;
     });
     html += "</ul>";
   }
 
-  if (data.is_first_month) {
+  if (isFirstMonth) {
     html += `<p><b>Tiền cọc:</b> ${data.deposit_amount.toLocaleString()} VNĐ</p>`;
   }
 
