@@ -90,6 +90,7 @@ async function showAssignContractView(tenantId, tenantName) {
   formMessage.style.display = "none";
 
   await loadAvailableApartments();
+  await loadServicesForContract();
 }
 
 async function loadAvailableApartments() {
@@ -123,6 +124,31 @@ async function loadAvailableApartments() {
   } catch (error) {
     console.error("Lỗi tải căn hộ:", error);
     contractApartmentSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+  }
+}
+
+// Load danh sách dịch vụ
+async function loadServicesForContract() {
+  const container = document.getElementById("contract-services");
+  container.innerHTML = "<p>Đang tải dịch vụ...</p>";
+
+  try {
+    const result = await apiFetch("/services"); // API bạn đã có
+    const services = result.services || [];
+
+    if (services.length === 0) {
+      container.innerHTML = "<p>Không có dịch vụ nào.</p>";
+      return;
+    }
+
+    container.innerHTML = services.map(s => `
+      <label style="display:block; margin-bottom:6px;">
+        <input type="checkbox" name="contract_service" value="${s.service_id}" />
+        ${s.name} (${new Intl.NumberFormat('vi-VN').format(s.price)} VNĐ)
+      </label>
+    `).join("");
+  } catch (err) {
+    container.innerHTML = "<p>Lỗi tải dịch vụ.</p>";
   }
 }
 
@@ -304,6 +330,9 @@ async function handleContractSubmit(event) {
     displayFormMessage("Vui lòng chọn một căn hộ.", "error");
     return;
   }
+  const selectedServices = Array.from(
+  document.querySelectorAll('input[name="contract_service"]:checked')
+).map(cb => cb.value);
 
   const payload = {
     contract_id: contract_id, 
@@ -312,10 +341,13 @@ async function handleContractSubmit(event) {
     start_date: document.getElementById("contract_start_date").value,
     end_date: document.getElementById("contract_end_date").value,
     deposit_amount: parseInt(document.getElementById("contract_deposit").value),
+    services: selectedServices,
   };
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Đang xử lý...";
+
+  console.log("Services gửi lên:", payload.services);
 
   try {
     const result = await apiFetch("/contracts", {
