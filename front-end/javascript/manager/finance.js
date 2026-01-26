@@ -45,7 +45,7 @@ function renderApartmentList(apartments) {
       <tbody>
   `;
 
-  apartments.forEach(a => {
+  apartments.forEach((a) => {
     html += `
       <tr>
         <td>${a.apartment_id}</td>
@@ -63,7 +63,7 @@ function renderApartmentList(apartments) {
   html += "</tbody></table>";
   listContainer.innerHTML = html;
 
-  document.querySelectorAll(".assign-btn").forEach(btn => {
+  document.querySelectorAll(".assign-btn").forEach((btn) => {
     btn.addEventListener("click", () => openBillingModal(btn.dataset.id));
   });
 }
@@ -75,7 +75,9 @@ async function openBillingModal(apartmentId) {
   currentApartmentId = apartmentId;
 
   try {
-    const result = await apiFetch(`/finance/prepare-billing?apartment_id=${apartmentId}`);
+    const result = await apiFetch(
+      `/finance/prepare-billing?apartment_id=${apartmentId}`,
+    );
     renderBillingModal(result);
     billingModal.style.display = "flex";
   } catch (err) {
@@ -93,7 +95,7 @@ function renderBillingModal(data) {
 
   html += "<h4>Chỉ số điện nước</h4>";
 
-  data.utilities.forEach(u => {
+  data.utilities.forEach((u) => {
     html += `
       <div class="form-group">
         <label>${u.utility_id} (chỉ số mới)</label>
@@ -106,7 +108,7 @@ function renderBillingModal(data) {
 
   if (data.services.length) {
     html += "<h4>Dịch vụ</h4><ul>";
-    data.services.forEach(s => {
+    data.services.forEach((s) => {
       html += `<li>${s.name}: ${s.price.toLocaleString()} VNĐ</li>`;
     });
     html += "</ul>";
@@ -129,7 +131,7 @@ submitBillingBtn.addEventListener("click", async () => {
   for (const input of inputs) {
     readings.push({
       utility_id: input.dataset.utility,
-      end_index: Number(input.value)
+      end_index: Number(input.value),
     });
   }
 
@@ -138,11 +140,13 @@ submitBillingBtn.addEventListener("click", async () => {
       method: "POST",
       body: {
         apartment_id: currentApartmentId,
-        utility_readings: readings
-      }
+        utility_readings: readings,
+      },
     });
 
-    alert(`Tạo hoá đơn thành công. Tổng tiền: ${result.total_amount.toLocaleString()} VNĐ`);
+    alert(
+      `Tạo hoá đơn thành công. Tổng tiền: ${result.total_amount.toLocaleString()} VNĐ`,
+    );
     billingModal.style.display = "none";
     loadDueApartments();
   } catch (err) {
