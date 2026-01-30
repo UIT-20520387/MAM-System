@@ -43,6 +43,7 @@ const tenantRoutes = require('./routes/manager/tenantRoutes');
 const contractRoutes = require('./routes/manager/contractRoutes');
 const financeRoutes = require('./routes/manager/financeRoutes');
 const serviceRoutes = require('./routes/manager/serviceRoutes');
+const billRoutes = require('./routes/manager/billRoutes');
 
 
 // app.use(cors(corsOptions));
@@ -63,6 +64,7 @@ app.use('/api/tenants', tenantRoutes);
 app.use('/api/contracts', contractRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/bills', billRoutes);
 
 // Tenant routes
 
